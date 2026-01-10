@@ -1,0 +1,23 @@
+services:
+
+  postgres:
+    image: postgres:14.2
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: "studs"
+      POSTGRES_USER: "s408737"
+      POSTGRES_PASSWORD: "password"
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+    volumes:
+      - course_database_data:/var/lib/postgresql/data
+
+volumes:
+  course_database_data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

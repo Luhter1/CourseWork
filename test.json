@@ -1,0 +1,16 @@
+[
+  {
+    "type": "UPDATE",
+    "resourceType": "dragons",
+    "resourceId": 9,
+    "body": {
+      "name": "Dragon Name",
+      "type": "FIRE",
+      "character": "EVIL",
+      "coordinates": {
+        "x": 100,
+        "y": 200.5
+      }
+    }
+  }
+]
