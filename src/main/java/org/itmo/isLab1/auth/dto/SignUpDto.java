@@ -1,13 +1,15 @@
 package org.itmo.isLab1.auth.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
 public class SignUpDto {
+    @Email(message = "Логин должен быть корректным адресом электронной почты")
     @Size(min = 3, max = 255, message = "Логин пользователя должен содержать от 3 до 255 символов")
-    @NotBlank(message = "Логин пользователя не может быть пустыми")
+    @NotBlank(message = "Логин пользователя не может быть пустым")
     private String username;
 
     @Size(min = 3, max = 255, message = "Имя пользователя должно содержать от 3 до 255 символов")
