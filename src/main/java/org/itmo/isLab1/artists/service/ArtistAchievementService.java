@@ -40,7 +40,7 @@ public class ArtistAchievementService {
      */
     public List<AchievementResponseDto> getArtistAchievements(Long artistId) {
         // Проверяем существование художника
-        ArtistDetails artist = artistDetailsRepository.findById(artistId)
+        artistDetailsRepository.findById(artistId)
                 .orElseThrow(() -> new ResourceNotFoundException("Художник с ID " + artistId + " не найден"));
 
         // Получаем все достижения и конвертируем в DTO

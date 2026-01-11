@@ -7,13 +7,8 @@ import org.itmo.isLab1.artists.dto.ArtistProfileResponse;
 import org.itmo.isLab1.artists.dto.ArtistProfileUpdateRequest;
 import org.itmo.isLab1.artists.entity.ArtistDetails;
 import org.itmo.isLab1.artists.repository.ArtistDetailsRepository;
-import org.itmo.isLab1.common.errors.ResourceNotFoundException;
-import org.itmo.isLab1.users.Role;
 import org.itmo.isLab1.users.User;
 import org.itmo.isLab1.users.UserRepository;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,16 +27,7 @@ public class ArtistService {
      * @param authentication объект аутентификации
      * @return профиль художника
      */
-    public ArtistProfileResponse getArtistProfile(Authentication authentication) {
-        // Извлекаем пользователя по email из authentication
-        String email = authentication.getName();
-        User user = userRepository.findByUsername(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с email " + email + " не найден"));
-
-        // Проверяем, что пользователь является художником
-        if (!Role.ROLE_ARTIST.equals(user.getRole())) {
-            throw new AccessDeniedException("Доступ разрешен только для художников");
-        }
+    public ArtistProfileResponse getArtistProfile(User user) {
 
         // Находим связанный ArtistDetails (может отсутствовать)
         ArtistDetails details = artistDetailsRepository.findByUser(user).orElse(null);
@@ -58,17 +44,7 @@ public class ArtistService {
      * @return обновленный профиль художника
      */
     @Transactional
-    public ArtistProfileResponse updateArtistProfile(Authentication authentication, ArtistProfileUpdateRequest request) {
-        // Извлекаем пользователя по email из authentication
-        String email = authentication.getName();
-        User user = userRepository.findByUsername(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с email " + email + " не найден"));
-
-        // Проверяем, что пользователь является художником
-        if (!Role.ROLE_ARTIST.equals(user.getRole())) {
-            throw new AccessDeniedException("Доступ разрешен только для художников");
-        }
-
+    public ArtistProfileResponse updateArtistProfile(User user, ArtistProfileUpdateRequest request) {
         // Обновляем данные пользователя
         artistMapper.updateUserFromRequest(request, user);
         User savedUser = userRepository.save(user);

@@ -35,8 +35,8 @@ public class JwtService {
     /**
      * Извлечение id пользователя из токена
      */
-    public Integer extractId(String token) {
-        return extractClaim(token, claims -> (Integer) claims.get("id"));
+    public Long extractId(String token) {
+        return extractClaim(token, claims -> (Long) claims.get("id"));
     }
 
     /**

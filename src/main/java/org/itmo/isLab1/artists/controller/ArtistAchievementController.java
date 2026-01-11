@@ -9,7 +9,6 @@ import org.itmo.isLab1.artists.entity.ArtistDetails;
 import org.itmo.isLab1.artists.repository.ArtistDetailsRepository;
 import org.itmo.isLab1.artists.service.ArtistAchievementService;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
-import org.itmo.isLab1.users.Role;
 import org.itmo.isLab1.users.User;
 import org.itmo.isLab1.users.UserRepository;
 import org.springframework.security.access.AccessDeniedException;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,7 +45,13 @@ public class ArtistAchievementController {
      */
     @GetMapping("/{id}/achievements")
     public List<AchievementResponseDto> getArtistAchievements(@PathVariable Long id) {
-        return artistAchievementService.getArtistAchievements(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с id " + id + " не найден"));
+
+        ArtistDetails artistDetails = artistDetailsRepository.findByUser(user)
+                .orElseThrow(() -> new ResourceNotFoundException("Профиль художника не найден"));
+
+        return artistAchievementService.getArtistAchievements(artistDetails.getId());
     }
 
     /**
@@ -119,11 +123,6 @@ public class ArtistAchievementController {
         String username = authentication.getPrincipal().toString();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь с username " + username + " не найден"));
-
-        // Проверяем, что пользователь является художником
-        if (!Role.ROLE_ARTIST.equals(user.getRole())) {
-            throw new AccessDeniedException("Доступ разрешен только для художников");
-        }
 
         // Находим связанный ArtistDetails
         ArtistDetails artistDetails = artistDetailsRepository.findByUser(user)

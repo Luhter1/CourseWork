@@ -27,7 +27,7 @@ public class User implements BaseEntity, UserDetails{
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "art2art_users_id_seq")
     @SequenceGenerator(name = "art2art_users_id_seq", sequenceName = "art2art_users_id_seq", allocationSize = 1)
-    private int id;
+    private Long id;
     
     @NotBlank
     @Column(name="email", nullable=false, unique=true)

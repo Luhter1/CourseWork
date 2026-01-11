@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 @NoArgsConstructor
 public class ResourceExtractor {
-  public Pair<String, Integer> getIdentification(BaseEntity entity) {
+  public Pair<String, Long> getIdentification(BaseEntity entity) {
     return new ImmutablePair<>(
       entity.getClass().getAnnotation(Table.class).name().toLowerCase().replace('_', '-'),
       entity.getId()
