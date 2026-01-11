@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class ArtistProfileResponse {
+public class ArtistProfileDto {
     private final Integer id;
     private final String email;
     private final String name;

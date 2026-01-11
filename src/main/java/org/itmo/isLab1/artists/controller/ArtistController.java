@@ -2,8 +2,9 @@ package org.itmo.isLab1.artists.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.itmo.isLab1.artists.dto.ArtistProfileResponse;
-import org.itmo.isLab1.artists.dto.ArtistProfileUpdateRequest;
+import org.itmo.isLab1.artists.dto.ArtistProfileDto;
+import org.itmo.isLab1.artists.dto.ArtistProfileUpdateDto;
+import org.itmo.isLab1.artists.dto.ArtistProfileCreateDto;
 import org.itmo.isLab1.artists.service.ArtistService;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
 import org.itmo.isLab1.users.User;
@@ -14,13 +15,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 /**
  * REST-контроллер для управления профилями художников
  */
 @RestController
-@RequestMapping("/api/artists/me")
+@RequestMapping("/api/artists")
 @RequiredArgsConstructor
 public class ArtistController {
 
@@ -28,14 +30,28 @@ public class ArtistController {
     private final UserRepository userRepository;
 
     /**
-     * Получение профиля текущего художника
+     * Получение профиля художника
      *
-     * @param authentication объект аутентификации Spring Security
      * @return профиль художника
      */
-    @GetMapping
+    @GetMapping("/{id}")
+    public ResponseEntity<ArtistProfileDto> getArtistProfile(
+            @PathVariable Long id) {
+        var user = userRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с id " + id + " не найден"));
+        var obj = artistService.getArtistProfile(user);
+
+        return ResponseEntity.ok(obj);
+    }
+
+    /**
+     * Получение профиля текущего художника
+     *
+     * @return профиль художника
+     */
+    @GetMapping("/me")
     @PreAuthorize("hasRole('ARTIST')")
-    public ResponseEntity<ArtistProfileResponse> getMyProfile() {
+    public ResponseEntity<ArtistProfileDto> getMyProfile() {
         var user = getCurrentUser();
         var obj = artistService.getArtistProfile(user);
 
@@ -43,15 +59,29 @@ public class ArtistController {
     }
 
     /**
+     * Создание профиля художника
+     *
+     * @param request        данные для создания профиля
+     * @return обновленный профиль художника
+     */
+    @PostMapping("/me")
+    @PreAuthorize("hasRole('ARTIST')")
+    public ResponseEntity<ArtistProfileDto> createMyProfile(@Valid @RequestBody ArtistProfileCreateDto request) {
+        var user = getCurrentUser();
+        var obj = artistService.createArtistProfile(user, request);
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(obj);
+    }
+
+    /**
      * Обновление профиля текущего художника
      *
      * @param request        данные для обновления профиля (валидированные)
-     * @param authentication объект аутентификации Spring Security
      * @return обновленный профиль художника
      */
-    @PutMapping
+    @PutMapping("/me")
     @PreAuthorize("hasRole('ARTIST')")
-    public ResponseEntity<ArtistProfileResponse> updateMyProfile(@Valid @RequestBody ArtistProfileUpdateRequest request) {
+    public ResponseEntity<ArtistProfileDto> updateMyProfile(@Valid @RequestBody ArtistProfileUpdateDto request) {
         var user = getCurrentUser();
         var obj = artistService.updateArtistProfile(user, request);
         
