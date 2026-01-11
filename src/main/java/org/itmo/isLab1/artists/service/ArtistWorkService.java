@@ -5,9 +5,9 @@ import org.itmo.isLab1.artists.WorkMapper;
 import org.itmo.isLab1.artists.dto.WorkCreateDto;
 import org.itmo.isLab1.artists.dto.WorkUpdateDto;
 import org.itmo.isLab1.artists.dto.WorkDto;
-import org.itmo.isLab1.artists.entity.ArtistDetails;
+import org.itmo.isLab1.artists.entity.ArtistProfile;
 import org.itmo.isLab1.artists.entity.Work;
-import org.itmo.isLab1.artists.repository.ArtistDetailsRepository;
+import org.itmo.isLab1.artists.repository.ArtistProfileRepository;
 import org.itmo.isLab1.artists.repository.WorkRepository;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
 import org.itmo.isLab1.users.User;
@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ArtistWorkService {
 
     private final WorkRepository workRepository;
-    private final ArtistDetailsRepository artistDetailsRepository;
+    private final ArtistProfileRepository artistDetailsRepository;
     private final UserRepository userRepository;
     private final WorkMapper workMapper;
 
@@ -43,7 +43,7 @@ public class ArtistWorkService {
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "Пользователь с id " + userId + " не найден"));
         
-        ArtistDetails artistDetails = artistDetailsRepository.findByUser(user)
+        ArtistProfile artistDetails = artistDetailsRepository.findByUser(user)
                 .orElseThrow(() -> new ResourceNotFoundException("Профиль художника не найден"));
 
         return workRepository.findByArtistId(artistDetails.getId(), pageable)
@@ -76,7 +76,7 @@ public class ArtistWorkService {
         Long artistId = getCurrentArtistId();
         
         // Находим художника
-        ArtistDetails artist = artistDetailsRepository.findById(artistId)
+        ArtistProfile artist = artistDetailsRepository.findById(artistId)
                 .orElseThrow(() -> new ResourceNotFoundException("Профиль художника не найден"));
 
         Work work = workMapper.toEntity(request, artist);
@@ -144,7 +144,7 @@ public class ArtistWorkService {
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "Пользователь с username " + username + " не найден"));
         
-        ArtistDetails artistDetails = artistDetailsRepository.findByUser(user)
+        ArtistProfile artistDetails = artistDetailsRepository.findByUser(user)
                 .orElseThrow(() -> new ResourceNotFoundException("Профиль художника не найден"));
         
         return artistDetails.getId();

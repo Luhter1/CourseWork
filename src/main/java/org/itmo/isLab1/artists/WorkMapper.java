@@ -5,7 +5,7 @@ import org.itmo.isLab1.common.mapper.ReferenceMapper;
 import org.itmo.isLab1.artists.dto.WorkCreateDto;
 import org.itmo.isLab1.artists.dto.WorkDto;
 import org.itmo.isLab1.artists.dto.WorkUpdateDto;
-import org.itmo.isLab1.artists.entity.ArtistDetails;
+import org.itmo.isLab1.artists.entity.ArtistProfile;
 import org.itmo.isLab1.artists.entity.Work;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -29,7 +29,7 @@ public interface WorkMapper {
     @Mapping(source = "createDto.artDirection", target = "artDirection")
     @Mapping(source = "createDto.date", target = "date")
     @Mapping(source = "createDto.link", target = "link")
-    Work toEntity(WorkCreateDto createDto, ArtistDetails artist);
+    Work toEntity(WorkCreateDto createDto, ArtistProfile artist);
 
     @Mapping(source = "updateDto.title", target = "title")
     @Mapping(source = "updateDto.description", target = "description")

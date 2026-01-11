@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.itmo.isLab1.artists.dto.AchievementCreateDto;
 import org.itmo.isLab1.artists.dto.AchievementDto;
 import org.itmo.isLab1.artists.dto.AchievementUpdateDto;
-import org.itmo.isLab1.artists.entity.ArtistDetails;
-import org.itmo.isLab1.artists.repository.ArtistDetailsRepository;
+import org.itmo.isLab1.artists.entity.ArtistProfile;
+import org.itmo.isLab1.artists.repository.ArtistProfileRepository;
 import org.itmo.isLab1.artists.service.ArtistAchievementService;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
 import org.itmo.isLab1.users.User;
@@ -40,7 +40,7 @@ public class ArtistAchievementController {
 
     private final ArtistAchievementService artistAchievementService;
     private final UserRepository userRepository;
-    private final ArtistDetailsRepository artistDetailsRepository;
+    private final ArtistProfileRepository artistDetailsRepository;
 
     /**
      * Получение списка достижений художника
@@ -55,7 +55,7 @@ public class ArtistAchievementController {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь с id " + id + " не найден"));
 
-        ArtistDetails artistDetails = artistDetailsRepository.findByUser(user)
+        ArtistProfile artistDetails = artistDetailsRepository.findByUser(user)
                 .orElseThrow(() -> new ResourceNotFoundException("Профиль художника не найден"));
 
         var objs = artistAchievementService.getArtistAchievements(artistDetails.getId(), pageable);
@@ -147,7 +147,7 @@ public class ArtistAchievementController {
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь с username " + username + " не найден"));
 
         // Находим связанный ArtistDetails
-        ArtistDetails artistDetails = artistDetailsRepository.findByUser(user)
+        ArtistProfile artistDetails = artistDetailsRepository.findByUser(user)
                 .orElseThrow(() -> new ResourceNotFoundException("Профиль художника не найден"));
 
         return artistDetails.getId();

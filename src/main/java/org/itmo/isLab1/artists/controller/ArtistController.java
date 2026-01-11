@@ -6,13 +6,11 @@ import org.itmo.isLab1.artists.dto.ArtistProfileDto;
 import org.itmo.isLab1.artists.dto.ArtistProfileUpdateDto;
 import org.itmo.isLab1.artists.dto.ArtistProfileCreateDto;
 import org.itmo.isLab1.artists.service.ArtistService;
-import org.itmo.isLab1.common.errors.ResourceNotFoundException;
 import org.itmo.isLab1.users.User;
 import org.itmo.isLab1.users.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
@@ -37,9 +35,7 @@ public class ArtistController {
     @GetMapping("/{id}")
     public ResponseEntity<ArtistProfileDto> getArtistProfile(
             @PathVariable Long id) {
-        var user = userRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с id " + id + " не найден"));
-        var obj = artistService.getArtistProfile(user);
+        var obj = artistService.getArtistProfile(id);
 
         return ResponseEntity.ok(obj);
     }
@@ -67,8 +63,7 @@ public class ArtistController {
     @PostMapping("/me")
     @PreAuthorize("hasRole('ARTIST')")
     public ResponseEntity<ArtistProfileDto> createMyProfile(@Valid @RequestBody ArtistProfileCreateDto request) {
-        var user = getCurrentUser();
-        var obj = artistService.createArtistProfile(user, request);
+        var obj = artistService.createArtistProfile(request);
         
         return ResponseEntity.status(HttpStatus.CREATED).body(obj);
     }
@@ -82,19 +77,16 @@ public class ArtistController {
     @PutMapping("/me")
     @PreAuthorize("hasRole('ARTIST')")
     public ResponseEntity<ArtistProfileDto> updateMyProfile(@Valid @RequestBody ArtistProfileUpdateDto request) {
-        var user = getCurrentUser();
-        var obj = artistService.updateArtistProfile(user, request);
+        var obj = artistService.updateArtistProfile(request);
         
         return ResponseEntity.ok(obj);
     }
 
     /**
-     * Вспомогательный метод для получения ID текущего художника из контекста безопасности
+     * Вспомогательный метод для получения текущего пользователя из контекста безопасности
      *
-     * @return ID художника
+     * @return ID пользователя
      * @throws UsernameNotFoundException если пользователь не найден
-     * @throws AccessDeniedException     если пользователь не является художником
-     * @throws ResourceNotFoundException если профиль художника не найден
      */
     private User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

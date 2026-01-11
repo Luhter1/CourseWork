@@ -5,12 +5,15 @@ import org.itmo.isLab1.artists.ArtistMapper;
 import org.itmo.isLab1.artists.dto.ArtistProfileCreateDto;
 import org.itmo.isLab1.artists.dto.ArtistProfileDto;
 import org.itmo.isLab1.artists.dto.ArtistProfileUpdateDto;
-import org.itmo.isLab1.artists.entity.ArtistDetails;
-import org.itmo.isLab1.artists.repository.ArtistDetailsRepository;
+import org.itmo.isLab1.artists.entity.ArtistProfile;
+import org.itmo.isLab1.artists.repository.ArtistProfileRepository;
 import org.itmo.isLab1.common.errors.EntityDuplicateException;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
 import org.itmo.isLab1.users.User;
 import org.itmo.isLab1.users.UserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,20 +22,31 @@ import org.springframework.transaction.annotation.Transactional;
 public class ArtistService {
 
     private final UserRepository userRepository;
-    private final ArtistDetailsRepository artistDetailsRepository;
+    private final ArtistProfileRepository artistDetailsRepository;
     private final ArtistMapper artistMapper;
+
+    /**
+     * Получает профиль художника по id
+     *
+     * @param id ID пользователя (художника)
+     * @return профиль художника
+     */
+    public ArtistProfileDto getArtistProfile(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с id " + id + " не найден"));
+
+        return getArtistProfile(user);
+    }
 
     /**
      * Получает профиль текущего художника
      *
-     * @param authentication объект аутентификации
+     * @param user пользователь (художник)
      * @return профиль художника
      */
     public ArtistProfileDto getArtistProfile(User user) {
-
         // Находим связанный ArtistDetails (может отсутствовать)
-        ArtistDetails details = artistDetailsRepository.findByUser(user).orElse(null);
-
+        ArtistProfile details = artistDetailsRepository.findByUser(user).orElse(null);
         // Преобразуем в DTO с помощью маппера
         return artistMapper.toProfileResponse(user, details);
     }
@@ -40,53 +54,74 @@ public class ArtistService {
     /**
      * Создает профиль художника
      *
-     * @param authentication объект аутентификации
-     * @param request        данные для обновления профиля
-     * @return обновленный профиль художника
+     * @param user    пользователь (художник)
+     * @param request данные для создания профиля
+     * @return созданный профиль художника
      */
     @Transactional
-    public ArtistProfileDto createArtistProfile(User user, ArtistProfileCreateDto request) {
-        // Находим или создаем ArtistDetails
-        ArtistDetails details = artistDetailsRepository.findByUser(user)
-                .orElse(null);
+    public ArtistProfileDto createArtistProfile(ArtistProfileCreateDto request) {
+        User user = getCurrentUser();
 
-        if (details != null) {
+        // Проверяем, что профиль еще не существует
+        if (artistDetailsRepository.findByUser(user).isPresent()) {
             throw new EntityDuplicateException("У художника уже создан профиль");
         }
-        details = artistMapper.toArtistDetails(request, user);
+        
+        // Создаем новый ArtistDetails
+        ArtistProfile details = artistMapper.toArtistDetails(request, user);
         
         // Сохраняем ArtistDetails
-        ArtistDetails savedDetails = artistDetailsRepository.save(details);
-
-        // Возвращаем обновленный профиль
+        ArtistProfile savedDetails = artistDetailsRepository.save(details);
+        System.out.println("\n\n\n HELLO \n\n\n");
+        
+        // Возвращаем профиль
         return artistMapper.toProfileResponse(user, savedDetails);
     }
 
     /**
      * Обновляет профиль художника
      *
-     * @param authentication объект аутентификации
-     * @param request        данные для обновления профиля
+     * @param user    пользователь (художник)
+     * @param request данные для обновления профиля
      * @return обновленный профиль художника
      */
     @Transactional
-    public ArtistProfileDto updateArtistProfile(User user, ArtistProfileUpdateDto request) {
-        // Находим или создаем ArtistDetails
-        ArtistDetails details = artistDetailsRepository.findByUser(user)
-        .orElseThrow(() -> new ResourceNotFoundException("У художника отсутствует профиль"));
+    public ArtistProfileDto updateArtistProfile(ArtistProfileUpdateDto request) {
+        User user = getCurrentUser();
         
-        // Обновляем данные пользователя
-        artistMapper.updateUserFromRequest(request, user);
-        User savedUser = userRepository.save(user);
-
-        details = artistDetailsRepository.findByUser(savedUser).orElse(null);
+        // Находим существующий ArtistDetails
+        ArtistProfile details = artistDetailsRepository.findByUser(user)
+                .orElseThrow(() -> new ResourceNotFoundException("У художника отсутствует профиль"));
+        
+        // Обновляем данные user только если нужно
+        if (request.getName() != null || request.getSurname() != null) {
+            artistMapper.updateUserFromRequest(request, user);
+            userRepository.save(user);  // Сохраняем user в той же транзакции
+        }
+        
+        // Обновляем ArtistDetails
         artistMapper.updateArtistDetailsFromRequest(request, details);
-
-
+        
         // Сохраняем ArtistDetails
-        ArtistDetails savedDetails = artistDetailsRepository.save(details);
-
+        ArtistProfile savedDetails = artistDetailsRepository.save(details);
+        
         // Возвращаем обновленный профиль
-        return artistMapper.toProfileResponse(savedUser, savedDetails);
+        return artistMapper.toProfileResponse(user, savedDetails);
+    }
+
+    /**
+     * Вспомогательный метод для получения текущего пользователя из контекста безопасности
+     *
+     * @return ID пользователя
+     * @throws UsernameNotFoundException если пользователь не найден
+     */
+    private User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // Извлекаем текущего пользователя из SecurityContextHolder.getContext().getAuthentication().getPrincipal()
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с username " + username + " не найден"));
+
+        return user;
     }
 }

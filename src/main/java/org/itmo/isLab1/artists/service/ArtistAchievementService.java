@@ -7,9 +7,9 @@ import org.itmo.isLab1.artists.dto.AchievementDto;
 import org.itmo.isLab1.artists.dto.AchievementUpdateDto;
 import org.itmo.isLab1.artists.entity.Achievement;
 import org.itmo.isLab1.artists.entity.AchievementTypeEnum;
-import org.itmo.isLab1.artists.entity.ArtistDetails;
+import org.itmo.isLab1.artists.entity.ArtistProfile;
 import org.itmo.isLab1.artists.repository.AchievementRepository;
-import org.itmo.isLab1.artists.repository.ArtistDetailsRepository;
+import org.itmo.isLab1.artists.repository.ArtistProfileRepository;
 import org.itmo.isLab1.common.errors.PolicyViolationError;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
 import org.springframework.data.domain.Page;
@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ArtistAchievementService {
 
     private final AchievementRepository achievementRepository;
-    private final ArtistDetailsRepository artistDetailsRepository;
+    private final ArtistProfileRepository artistDetailsRepository;
     private final AchievementMapper achievementMapper;
 
     /**
@@ -65,7 +65,7 @@ public class ArtistAchievementService {
         }
 
         // Находим художника
-        ArtistDetails artist = artistDetailsRepository.findById(artistId)
+        ArtistProfile artist = artistDetailsRepository.findById(artistId)
                 .orElseThrow(() -> new ResourceNotFoundException("Художник с ID " + artistId + " не найден"));
 
         // Создаем сущность через маппер

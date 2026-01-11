@@ -16,7 +16,7 @@ import java.time.ZonedDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "art2art_artist_details")
-public class ArtistDetails implements BaseEntity {
+public class ArtistProfile implements BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "art2art_artist_details_id_seq")
     @SequenceGenerator(name = "art2art_artist_details_id_seq", sequenceName = "art2art_artist_details_id_seq", allocationSize = 1)

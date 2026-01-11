@@ -18,7 +18,7 @@ public class ArtistProfileUpdateDto {
     @Size(max = 100, message = "Фамилия должна содержать максимум 100 символов")
     private final JsonNullable<String> surname;
 
-    @Size(max = 2000, message = "Биография должна содержать максимум 2000 символов")
+    @Size(max = 500, message = "Биография должна содержать максимум 500 символов")
     private final JsonNullable<String> biography;
 
     @Size(max = 200, message = "Местоположение должно содержать максимум 200 символов")

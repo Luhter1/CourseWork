@@ -32,7 +32,7 @@ public class Work implements BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "artist_id", nullable = false)
     @NotNull(message = "Artist is required")
-    private ArtistDetails artist;
+    private ArtistProfile artist;
 
     @Column(name = "title", nullable = false, length = 255)
     @NotBlank(message = "Title is required")
