@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.itmo.isLab1.common.entity.BaseEntity;
@@ -46,7 +47,7 @@ public class Achievement implements BaseEntity {
     @Column(name = "type", nullable = false)
     @NotNull(message = "Achievement type is required")
     @ColumnTransformer(write="?::art2art_achievements_type_enum")
-    private AchievementType type;
+    private AchievementTypeEnum type;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
