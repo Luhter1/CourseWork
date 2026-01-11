@@ -1,5 +1,7 @@
 package org.itmo.isLab1.artists.dto;
 
+import org.openapitools.jackson.nullable.JsonNullable;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
@@ -17,22 +19,22 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WorkRequest {
+public class WorkUpdateDto {
     
     @NotBlank(message = "Название работы не может быть пустым")
     @Size(max = 255, message = "Название должно содержать максимум 255 символов")
-    private String title;
+    private JsonNullable<String> title;
     
     @Size(max = 500, message = "Описание должно содержать максимум 500 символов")
-    private String description;
+    private JsonNullable<String> description;
     
     @NotNull(message = "Направление искусства обязательно")
-    private ArtDirectionEnum artDirection;
+    private JsonNullable<ArtDirectionEnum> artDirection;
     
     @NotNull(message = "Дата создания работы обязательна")
     @PastOrPresent(message = "Дата создания работы не может быть в будущем")
-    private LocalDate date;
+    private JsonNullable<LocalDate> date;
     
     @URL(message = "Ссылка должна быть корректным URL")
-    private String link;
+    private JsonNullable<String> link;
 }

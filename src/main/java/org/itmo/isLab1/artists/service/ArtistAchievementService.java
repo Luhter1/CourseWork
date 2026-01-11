@@ -6,7 +6,7 @@ import org.itmo.isLab1.artists.dto.AchievementCreateDto;
 import org.itmo.isLab1.artists.dto.AchievementDto;
 import org.itmo.isLab1.artists.dto.AchievementUpdateDto;
 import org.itmo.isLab1.artists.entity.Achievement;
-import org.itmo.isLab1.artists.entity.AchievementType;
+import org.itmo.isLab1.artists.entity.AchievementTypeEnum;
 import org.itmo.isLab1.artists.entity.ArtistDetails;
 import org.itmo.isLab1.artists.repository.AchievementRepository;
 import org.itmo.isLab1.artists.repository.ArtistDetailsRepository;
@@ -60,7 +60,7 @@ public class ArtistAchievementService {
     @Transactional
     public AchievementDto createAchievement(Long artistId, AchievementCreateDto createDto) {
         // Проверяем, что тип не AUTO
-        if (createDto.getType() == AchievementType.AUTO) {
+        if (createDto.getType() == AchievementTypeEnum.AUTO) {
             throw new PolicyViolationError("Нельзя создавать достижения с типом AUTO");
         }
 
@@ -96,7 +96,7 @@ public class ArtistAchievementService {
                         "Достижение с ID " + achievementId + " не найдено для художника с ID " + artistId));
 
         // Проверяем, что тип не AUTO (нельзя редактировать автоматические достижения)
-        if (achievement.getType() == AchievementType.AUTO) {
+        if (achievement.getType() == AchievementTypeEnum.AUTO) {
             throw new PolicyViolationError("Нельзя редактировать достижения с типом AUTO");
         }
 
@@ -125,7 +125,7 @@ public class ArtistAchievementService {
                         "Достижение с ID " + achievementId + " не найдено для художника с ID " + artistId));
 
         // Проверяем, что тип не AUTO (нельзя удалять автоматические достижения)
-        if (achievement.getType() == AchievementType.AUTO) {
+        if (achievement.getType() == AchievementTypeEnum.AUTO) {
             throw new PolicyViolationError("Нельзя удалять достижения с типом AUTO");
         }
 

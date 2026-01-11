@@ -2,8 +2,9 @@ package org.itmo.isLab1.artists.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.itmo.isLab1.artists.dto.WorkRequest;
-import org.itmo.isLab1.artists.dto.WorkResponse;
+import org.itmo.isLab1.artists.dto.WorkCreateDto;
+import org.itmo.isLab1.artists.dto.WorkDto;
+import org.itmo.isLab1.artists.dto.WorkUpdateDto;
 import org.itmo.isLab1.artists.service.ArtistWorkService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,10 +39,10 @@ public class ArtistWorkController {
      * @return страница работ
      */
     @GetMapping("/{id}/works")
-    public ResponseEntity<Page<WorkResponse>> getWorks(
+    public ResponseEntity<Page<WorkDto>> getWorks(
             @PathVariable Long id,
             @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
-        var works = artistWorkService.getWorksForArtist(pageable);
+        var works = artistWorkService.getWorksForArtist(pageable, id);
         
         return ResponseEntity.ok()
                 .header("X-Total-Count", String.valueOf(works.getTotalElements()))
@@ -56,7 +57,7 @@ public class ArtistWorkController {
      */
     @GetMapping("/me/works")
     @PreAuthorize("hasRole('ARTIST')")
-    public ResponseEntity<Page<WorkResponse>> getWorksForCurrentArtist(
+    public ResponseEntity<Page<WorkDto>> getWorksForCurrentArtist(
             @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         var works = artistWorkService.getWorksForCurrentArtist(pageable);
         
@@ -73,7 +74,7 @@ public class ArtistWorkController {
      */
     @PostMapping("/me/works")
     @PreAuthorize("hasRole('ARTIST')")
-    public ResponseEntity<WorkResponse> createWork(@Valid @RequestBody WorkRequest request) {
+    public ResponseEntity<WorkDto> createWork(@Valid @RequestBody WorkCreateDto request) {
         var work = artistWorkService.createWork(request);
         
         return ResponseEntity.status(HttpStatus.CREATED).body(work);
@@ -88,9 +89,9 @@ public class ArtistWorkController {
      */
     @PutMapping("/me/works/{id}")
     @PreAuthorize("hasRole('ARTIST')")
-    public ResponseEntity<WorkResponse> updateWork(
+    public ResponseEntity<WorkDto> updateWork(
             @PathVariable Long id,
-            @Valid @RequestBody WorkRequest request) {
+            @Valid @RequestBody WorkUpdateDto request) {
         var work = artistWorkService.updateWork(id, request);
         
         return ResponseEntity.ok(work);

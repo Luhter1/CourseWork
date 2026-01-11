@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.URL;
-import org.itmo.isLab1.artists.entity.AchievementType;
+import org.itmo.isLab1.artists.entity.AchievementTypeEnum;
 
 @Data
 @NoArgsConstructor
@@ -15,7 +15,7 @@ import org.itmo.isLab1.artists.entity.AchievementType;
 public class AchievementCreateDto {
     
     @NotNull(message = "Тип достижения обязателен")
-    private AchievementType type;
+    private AchievementTypeEnum type;
     
     @NotBlank(message = "Название достижения не может быть пустым")
     @Size(min = 1, max = 255, message = "Название должно содержать от 1 до 255 символов")

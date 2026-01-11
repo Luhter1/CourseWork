@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.itmo.isLab1.artists.entity.AchievementType;
+import org.itmo.isLab1.artists.entity.AchievementTypeEnum;
 
 @Data
 @Builder
@@ -12,7 +12,7 @@ import org.itmo.isLab1.artists.entity.AchievementType;
 @AllArgsConstructor
 public class AchievementDto {
     private Long id;
-    private AchievementType type;
+    private AchievementTypeEnum type;
     private String title;
     private String description;
     private String link;

@@ -5,11 +5,10 @@ import lombok.Data;
 import org.itmo.isLab1.artists.entity.ArtDirectionEnum;
 
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
 
 @Data
 @Builder
-public class WorkResponse {
+public class WorkDto {
     
     private Long id;
     
