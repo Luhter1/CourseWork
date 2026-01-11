@@ -175,7 +175,8 @@ CREATE TABLE art2art_achievements (
     description     TEXT,
     link            TEXT,
     type            art2art_achievements_type_enum NOT NULL,
-    created_at      TIMESTAMP DEFAULT now()
+    created_at      TIMESTAMP DEFAULT now(),
+    updated_at      TIMESTAMP DEFAULT now()
 );
 
 -- таблица с отзывами художников о резиденциях
