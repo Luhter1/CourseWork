@@ -99,7 +99,7 @@ public class ArtistController {
     private User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         // Извлекаем текущего пользователя из SecurityContextHolder.getContext().getAuthentication().getPrincipal()
-        String username = authentication.getPrincipal().toString();
+        String username = authentication.getName();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь с username " + username + " не найден"));
 

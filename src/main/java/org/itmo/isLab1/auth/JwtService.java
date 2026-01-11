@@ -36,7 +36,14 @@ public class JwtService {
      * Извлечение id пользователя из токена
      */
     public Long extractId(String token) {
-        return extractClaim(token, claims -> (Long) claims.get("id"));
+        return extractClaim(token, claims -> {
+            Object id = claims.get("id");
+            if (id == null) {
+                return null;
+            }
+            // Number - родительский класс для Integer, Long, Double и т.д.
+            return ((Number) id).longValue();
+        });
     }
 
     /**
