@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.itmo.isLab1.auth.dto.AuthenticationDto;
 import org.itmo.isLab1.auth.dto.SignInDto;
 import org.itmo.isLab1.auth.dto.SignUpDto;
-import org.itmo.isLab1.users.Role;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -19,22 +18,12 @@ import org.itmo.isLab1.users.Role;
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
-    @PostMapping("/artist/sign-up")
+    @PostMapping("/register")
     public AuthenticationDto signUpArtist(@RequestBody @Valid SignUpDto request) {
-        return authenticationService.signUp(request, Role.ROLE_ARTIST);
+        return authenticationService.signUp(request);
     }
 
-    @PostMapping("/expert/sign-up")
-    public AuthenticationDto signUpExpert(@RequestBody @Valid SignUpDto request) {
-        return authenticationService.signUp(request, Role.ROLE_EXPERT);
-    }
-
-    @PostMapping("/residence-admin/sign-up")
-    public AuthenticationDto signUpResidenceAdmin(@RequestBody @Valid SignUpDto request) {
-        return authenticationService.signUp(request, Role.ROLE_RESIDENCE_ADMIN);
-    }
-
-    @PostMapping("/sign-in")
+    @PostMapping("/login")
     public AuthenticationDto signIn(@RequestBody @Valid SignInDto request) {
         return authenticationService.signIn(request);
     }

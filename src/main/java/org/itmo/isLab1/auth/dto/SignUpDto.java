@@ -1,8 +1,11 @@
 package org.itmo.isLab1.auth.dto;
 
+import org.itmo.isLab1.users.Role;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -23,4 +26,7 @@ public class SignUpDto {
     @Size(min = 6, max = 128, message = "Длина пароля должна быть от 6 до 128")
     @NotBlank(message = "Пароль не может быть пустыми")
     private String password;
+
+    @NotNull(message = "Роль пользователя должна быть указана")
+    private Role role;
 }

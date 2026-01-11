@@ -10,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.itmo.isLab1.auth.dto.AuthenticationDto;
 import org.itmo.isLab1.auth.dto.SignInDto;
 import org.itmo.isLab1.auth.dto.SignUpDto;
-import org.itmo.isLab1.users.User;
 import org.itmo.isLab1.users.Role;
+import org.itmo.isLab1.users.User;
 import org.itmo.isLab1.users.UserService;
 
 @Service
@@ -26,7 +26,8 @@ public class AuthenticationService {
      * Регистрация пользователя
      */
     @Transactional
-    public AuthenticationDto signUp(SignUpDto request, Role role) {
+    public AuthenticationDto signUp(SignUpDto request) {
+        Role role = request.getRole() == Role.ROLE_SUPERADMIN ? Role.ROLE_ARTIST : request.getRole();
         var user = User.builder()
             .username(request.getUsername())
             .name(request.getUsername())
