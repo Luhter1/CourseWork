@@ -162,7 +162,7 @@ CREATE TABLE art2art_media (
     work_id         BIGINT NOT NULL REFERENCES art2art_portfolio_works(id) ON DELETE CASCADE,
     uri             TEXT NOT NULL,
     media_type      VARCHAR(50) CHECK (media_type IN ('image', 'video')),
-    metadata        JSONB,
+    file_size       BIGINT,
     created_at      TIMESTAMP DEFAULT now()
 );
 

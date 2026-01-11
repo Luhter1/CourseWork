@@ -64,7 +64,7 @@ dependencies {
 	implementation 'com.fasterxml.uuid:java-uuid-generator:5.1.0'
 	
 	// MinIO
-	implementation 'io.minio:minio:8.5.7'
+	implementation 'io.minio:minio:8.5.14'
 
 	// Flyway
 	implementation 'org.flywaydb:flyway-core'
