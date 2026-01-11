@@ -3,13 +3,16 @@ package org.itmo.isLab1.artists.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.validator.constraints.URL;
 import org.itmo.isLab1.common.entity.BaseEntity;
 import org.itmo.isLab1.utils.datetime.ZonedDateTimeConverter;
 
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 
 @Data
@@ -17,12 +20,12 @@ import java.time.ZonedDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "art2art_achievements")
-public class Achievement implements BaseEntity {
+@Table(name = "art2art_portfolio_works")
+public class Work implements BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "art2art_achievements_id_seq")
-    @SequenceGenerator(name = "art2art_achievements_id_seq", sequenceName = "art2art_achievements_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "art2art_portfolio_works_id_seq")
+    @SequenceGenerator(name = "art2art_portfolio_works_id_seq", sequenceName = "art2art_portfolio_works_id_seq", allocationSize = 1)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -32,21 +35,26 @@ public class Achievement implements BaseEntity {
 
     @Column(name = "title", nullable = false, length = 255)
     @NotBlank(message = "Title is required")
-    @Size(min = 1, max = 255, message = "Title must be between 1 and 255 characters")
+    @Size(max = 255, message = "Title must not exceed 255 characters")
     private String title;
 
     @Column(name = "description", columnDefinition = "TEXT")
-    @Size(max = 500, message = "Description must not exceed 500 characters")
     private String description;
 
     @Column(name = "link", columnDefinition = "TEXT")
+    @URL(message = "Link must be a valid URL")
     private String link;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
-    @NotNull(message = "Achievement type is required")
-    @ColumnTransformer(write="?::art2art_achievements_type_enum")
-    private AchievementType type;
+    @Column(name = "art_direction", nullable = false)
+    @NotNull(message = "Art direction is required")
+    @ColumnTransformer(write="?::art2art_art_direction_enum")
+    private ArtDirectionEnum artDirection;
+
+    @Column(name = "date", nullable = false)
+    @NotNull(message = "Date is required")
+    @PastOrPresent(message = "Date must be in the past or present")
+    private LocalDate date;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
