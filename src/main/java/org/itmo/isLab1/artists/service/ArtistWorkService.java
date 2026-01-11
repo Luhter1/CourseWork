@@ -138,7 +138,7 @@ public class ArtistWorkService {
      */
     private Long getCurrentArtistId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getPrincipal().toString();
+        String username = authentication.getName();
         
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(

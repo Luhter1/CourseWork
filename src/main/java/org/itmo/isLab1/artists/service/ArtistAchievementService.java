@@ -12,8 +12,14 @@ import org.itmo.isLab1.artists.repository.AchievementRepository;
 import org.itmo.isLab1.artists.repository.ArtistProfileRepository;
 import org.itmo.isLab1.common.errors.PolicyViolationError;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
+import org.itmo.isLab1.users.User;
+import org.itmo.isLab1.users.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,18 +35,35 @@ public class ArtistAchievementService {
     private final AchievementRepository achievementRepository;
     private final ArtistProfileRepository artistDetailsRepository;
     private final AchievementMapper achievementMapper;
+    private final UserRepository userRepository;
 
     /**
-     * Получает все достижения художника, отсортированные по дате создания (от новых к старым).
+     * Получает все достижения художника
      *
-     * @param artistId ID художника
+     * @param userId ID пользователя
      * @return список достижений в виде DTO
      * @throws ResourceNotFoundException если художник с указанным ID не найден
      */
-    public Page<AchievementDto> getArtistAchievements(Long artistId, Pageable pageable) {
-        // Проверяем существование художника
-        artistDetailsRepository.findById(artistId)
-                .orElseThrow(() -> new ResourceNotFoundException("Художник с ID " + artistId + " не найден"));
+    public Page<AchievementDto> getArtistAchievements(Long userId, Pageable pageable) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с id " + userId + " не найден"));
+
+        Long artistId = artistDetailsRepository.findByUser(user)
+                .orElseThrow(() -> new ResourceNotFoundException("Профиль художника с id " + userId + " не найден")).getId();
+
+        // Получаем все достижения и конвертируем в DTO
+        return achievementRepository.findByArtistIdOrderByCreatedAtDesc(artistId, pageable)
+            .map(achievementMapper::toResponseDto);
+    }
+
+    /**
+     * Получает все достижения текущего художника
+     *
+     * @return список достижений в виде DTO
+     * @throws ResourceNotFoundException если художник с указанным ID не найден
+     */
+    public Page<AchievementDto> getCurrentArtistAchievements(Pageable pageable) {
+        Long artistId = getCurrentArtistId();
 
         // Получаем все достижения и конвертируем в DTO
         return achievementRepository.findByArtistIdOrderByCreatedAtDesc(artistId, pageable)
@@ -51,14 +74,15 @@ public class ArtistAchievementService {
      * Создает новое достижение для художника.
      * Запрещено создание достижений с типом AUTO (системные достижения).
      *
-     * @param artistId  ID художника
      * @param createDto данные для создания достижения
      * @return созданное достижение в виде DTO
      * @throws PolicyViolationError      если тип достижения AUTO
      * @throws ResourceNotFoundException если художник с указанным ID не найден
      */
     @Transactional
-    public AchievementDto createAchievement(Long artistId, AchievementCreateDto createDto) {
+    public AchievementDto createAchievement(AchievementCreateDto createDto) {
+        Long artistId = getCurrentArtistId();
+
         // Проверяем, что тип не AUTO
         if (createDto.getType() == AchievementTypeEnum.AUTO) {
             throw new PolicyViolationError("Нельзя создавать достижения с типом AUTO");
@@ -69,8 +93,7 @@ public class ArtistAchievementService {
                 .orElseThrow(() -> new ResourceNotFoundException("Художник с ID " + artistId + " не найден"));
 
         // Создаем сущность через маппер
-        Achievement achievement = achievementMapper.toEntity(createDto);
-        achievement.setArtist(artist);
+        Achievement achievement = achievementMapper.toEntity(createDto, artist);
 
         // Сохраняем и возвращаем DTO
         Achievement savedAchievement = achievementRepository.save(achievement);
@@ -81,7 +104,6 @@ public class ArtistAchievementService {
      * Обновляет существующее достижение художника.
      * Запрещено обновление достижений с типом AUTO (системные достижения).
      *
-     * @param artistId      ID художника
      * @param achievementId ID достижения
      * @param updateDto     данные для обновления
      * @return обновленное достижение в виде DTO
@@ -89,7 +111,9 @@ public class ArtistAchievementService {
      * @throws PolicyViolationError      если попытка обновить достижение с типом AUTO
      */
     @Transactional
-    public AchievementDto updateAchievement(Long artistId, Long achievementId, AchievementUpdateDto updateDto) {
+    public AchievementDto updateAchievement(Long achievementId, AchievementUpdateDto updateDto) {
+        Long artistId = getCurrentArtistId();
+
         // Находим достижение и проверяем принадлежность художнику
         Achievement achievement = achievementRepository.findByIdAndArtistId(achievementId, artistId)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -131,5 +155,27 @@ public class ArtistAchievementService {
 
         // Удаляем достижение
         achievementRepository.delete(achievement);
+    }
+
+    /**
+     * Вспомогательный метод для получения ID текущего художника из контекста безопасности
+     *
+     * @return ID художника
+     * @throws UsernameNotFoundException если пользователь не найден
+     * @throws AccessDeniedException     если пользователь не является художником
+     * @throws ResourceNotFoundException если профиль художника не найден
+     */
+    private Long getCurrentArtistId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // Извлекаем текущего пользователя из SecurityContextHolder.getContext().getAuthentication().getPrincipal()
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с username " + username + " не найден"));
+
+        // Находим связанный ArtistDetails
+        ArtistProfile artistDetails = artistDetailsRepository.findByUser(user)
+                .orElseThrow(() -> new ResourceNotFoundException("Профиль художника не найден"));
+
+        return artistDetails.getId();
     }
 }

@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -52,13 +53,7 @@ public class ArtistAchievementController {
         @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
         @PathVariable Long id
     ) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с id " + id + " не найден"));
-
-        ArtistProfile artistDetails = artistDetailsRepository.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("Профиль художника не найден"));
-
-        var objs = artistAchievementService.getArtistAchievements(artistDetails.getId(), pageable);
+        var objs = artistAchievementService.getArtistAchievements(id, pageable);
 
         return ResponseEntity.ok()
             .header("X-Total-Count", String.valueOf(objs.getTotalElements()))
@@ -75,8 +70,7 @@ public class ArtistAchievementController {
     public ResponseEntity<Page<AchievementDto>> getMyAchievements(
         @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.ASC) Pageable pageable
     ) {
-        Long artistId = getCurrentArtistId();
-        var objs = artistAchievementService.getArtistAchievements(artistId, pageable);
+        var objs = artistAchievementService.getCurrentArtistAchievements(pageable);
         return ResponseEntity.ok()
             .header("X-Total-Count", String.valueOf(objs.getTotalElements()))
             .body(objs);
@@ -91,9 +85,8 @@ public class ArtistAchievementController {
     @PostMapping("/me/achievements")
     @PreAuthorize("hasRole('ARTIST')")
     public ResponseEntity<AchievementDto> createAchievement(
-            @Valid AchievementCreateDto createDto) {
-        Long artistId = getCurrentArtistId();
-        var obj = artistAchievementService.createAchievement(artistId, createDto);
+            @Valid @RequestBody AchievementCreateDto createDto) {
+        var obj = artistAchievementService.createAchievement(createDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(obj);
     }
@@ -109,9 +102,8 @@ public class ArtistAchievementController {
     @PreAuthorize("hasRole('ARTIST')")
     public ResponseEntity<AchievementDto> updateAchievement(
             @PathVariable Long id,
-            @Valid AchievementUpdateDto updateDto) {
-        Long artistId = getCurrentArtistId();
-        var obj = artistAchievementService.updateAchievement(artistId, id, updateDto);
+            @Valid @RequestBody AchievementUpdateDto updateDto) {
+        var obj = artistAchievementService.updateAchievement(id, updateDto);
 
         return ResponseEntity.ok(obj);
     }
@@ -142,7 +134,7 @@ public class ArtistAchievementController {
     private Long getCurrentArtistId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         // Извлекаем текущего пользователя из SecurityContextHolder.getContext().getAuthentication().getPrincipal()
-        String username = authentication.getPrincipal().toString();
+        String username = authentication.getName();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь с username " + username + " не найден"));
 

@@ -7,21 +7,21 @@ CREATE TYPE art2art_user_role_enum AS ENUM (
 );
 
 CREATE TYPE art2art_art_direction_enum AS ENUM (
-    'painting',
-    'sculpture',
-    'performance',
-    'multimedia',
-    'digital_art',
-    'photo',
-    'other'
+    'PAINTING',
+    'SCULPTURE',
+    'PERFORMANCE',
+    'MULTIMEDIA',
+    'DIGITAL_ART',
+    'PHOTO',
+    'OTHER'
 );
 
 CREATE TYPE art2art_achievements_type_enum AS ENUM (
-    'education',
-    'exhibition',
-    'publication',
-    'award',
-    'auto'
+    'EDUCATION',
+    'EXHIBITION',
+    'PUBLICATION',
+    'AWARD',
+    'AUTO'
 );
 
 -- таблица пользователей

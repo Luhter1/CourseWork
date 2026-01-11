@@ -7,7 +7,9 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.itmo.isLab1.common.entity.BaseEntity;
 import org.itmo.isLab1.utils.datetime.ZonedDateTimeConverter;
 
@@ -44,6 +46,7 @@ public class Achievement implements BaseEntity {
     private String link;
 
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(name = "type", nullable = false)
     @NotNull(message = "Achievement type is required")
     @ColumnTransformer(write="?::art2art_achievements_type_enum")
