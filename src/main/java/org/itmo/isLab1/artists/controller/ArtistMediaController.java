@@ -2,7 +2,7 @@ package org.itmo.isLab1.artists.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.itmo.isLab1.artists.dto.MediaDto;
-import org.itmo.isLab1.artists.service.ArtistWorkService;
+import org.itmo.isLab1.artists.service.ArtistMediaService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -27,7 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ArtistMediaController {
 
-    private final ArtistWorkService artistWorkService;
+    private final ArtistMediaService artistWorkService;
 
     /**
      * Получение списка медиафайлов работы для публичного доступа
@@ -39,10 +39,10 @@ public class ArtistMediaController {
      */
     @GetMapping("/{id}/works/{workId}/media")
     public ResponseEntity<Page<MediaDto>> getWorkMediasPublic(
-            @PathVariable Long id,
+            @PathVariable Long userId,
             @PathVariable Long workId,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<MediaDto> mediaPage = artistWorkService.getWorkMedias(id, workId, pageable);
+        Page<MediaDto> mediaPage = artistWorkService.getArtistWorkMedias(userId, workId, pageable);
         
         return ResponseEntity.ok()
                 .header("X-Total-Count", String.valueOf(mediaPage.getTotalElements()))
@@ -61,9 +61,7 @@ public class ArtistMediaController {
     public ResponseEntity<Page<MediaDto>> getWorkMediasForCurrentArtist(
             @PathVariable Long workId,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        // Получаем ID текущего художника из контекста безопасности
-        Long currentArtistId = artistWorkService.getCurrentArtistIdForController();
-        Page<MediaDto> mediaPage = artistWorkService.getWorkMedias(currentArtistId, workId, pageable);
+        Page<MediaDto> mediaPage = artistWorkService.getCurrentArtistWorkMedias(workId, pageable);
         
         return ResponseEntity.ok()
                 .header("X-Total-Count", String.valueOf(mediaPage.getTotalElements()))
