@@ -176,8 +176,8 @@ public class ArtistWorkService {
         // Конвертируем в DTO и добавляем presigned URLs
         return mediaPage.map(media -> {
             MediaDto dto = mediaMapper.toDto(media);
-            // Генерируем presigned URL для доступа к файлу (время жизни 1 час)
-            String presignedUrl = minioService.generatePresignedUrl(media.getUri(), 3600);
+            // Генерируем presigned URL для доступа к файлу (время жизни 1 день)
+            String presignedUrl = minioService.generatePresignedUrl(media.getUri());
             // Создаем новый DTO с обновленным URI
             return new MediaDto(dto.getId(), presignedUrl, dto.getMediaType(),
                                dto.getFileSize());
@@ -223,7 +223,7 @@ public class ArtistWorkService {
                 Media savedMedia = mediaRepository.save(media);
                 
                 // Генерируем presigned URL для ответа
-                String presignedUrl = minioService.generatePresignedUrl(objectName, 3600);
+                String presignedUrl = minioService.generatePresignedUrl(objectName);
                 MediaDto dto = mediaMapper.toDto(savedMedia);
                 MediaDto responseDto = new MediaDto(dto.getId(), presignedUrl, dto.getMediaType(),
                                                   dto.getFileSize());

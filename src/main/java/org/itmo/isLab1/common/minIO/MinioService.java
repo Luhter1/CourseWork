@@ -1,13 +1,13 @@
 package org.itmo.isLab1.common.minIO;
 
 import io.minio.*;
+import io.minio.http.Method;
 import io.minio.errors.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.ErrorResponseException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
