@@ -15,6 +15,7 @@ import org.itmo.isLab1.users.UserRepository;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +32,7 @@ import java.util.List;
  * REST-контроллер для управления достижениями текущего художника
  */
 @RestController
-@RequestMapping("/api/artists/me/achievements")
+@RequestMapping("/api/artists")
 @RequiredArgsConstructor
 public class ArtistAchievementController {
 
@@ -40,15 +41,24 @@ public class ArtistAchievementController {
     private final ArtistDetailsRepository artistDetailsRepository;
 
     /**
-     * Получение списка достижений текущего художника
+     * Получение списка достижений художника
      *
-     * @param authentication объект аутентификации Spring Security
      * @return список достижений
      */
-    @GetMapping
+    @GetMapping("/{id}/achievements")
+    public List<AchievementResponseDto> getArtistAchievements(@PathVariable Long id) {
+        return artistAchievementService.getArtistAchievements(id);
+    }
+
+    /**
+     * Получение списка достижений текущего художника
+     *
+     * @return список достижений
+     */
+    @GetMapping("/me/achievements")
     @PreAuthorize("hasRole('ARTIST')")
-    public List<AchievementResponseDto> getMyAchievements(Authentication authentication) {
-        Long artistId = getCurrentArtistId(authentication);
+    public List<AchievementResponseDto> getMyAchievements() {
+        Long artistId = getCurrentArtistId();
         return artistAchievementService.getArtistAchievements(artistId);
     }
 
@@ -56,15 +66,13 @@ public class ArtistAchievementController {
      * Создание нового достижения для текущего художника
      *
      * @param createDto      данные для создания достижения (валидированные)
-     * @param authentication объект аутентификации Spring Security
      * @return созданное достижение
      */
-    @PostMapping
+    @PostMapping("/me/achievements")
     @PreAuthorize("hasRole('ARTIST')")
     public AchievementResponseDto createAchievement(
-            @RequestBody @Valid AchievementCreateDto createDto,
-            Authentication authentication) {
-        Long artistId = getCurrentArtistId(authentication);
+            @Valid AchievementCreateDto createDto) {
+        Long artistId = getCurrentArtistId();
         return artistAchievementService.createAchievement(artistId, createDto);
     }
 
@@ -73,16 +81,14 @@ public class ArtistAchievementController {
      *
      * @param id             ID достижения
      * @param updateDto      данные для обновления (валидированные)
-     * @param authentication объект аутентификации Spring Security
      * @return обновленное достижение
      */
-    @PutMapping("/{id}")
+    @PutMapping("/me/achievements/{id}")
     @PreAuthorize("hasRole('ARTIST')")
     public AchievementResponseDto updateAchievement(
             @PathVariable Long id,
-            @RequestBody @Valid AchievementUpdateDto updateDto,
-            Authentication authentication) {
-        Long artistId = getCurrentArtistId(authentication);
+            @Valid AchievementUpdateDto updateDto) {
+        Long artistId = getCurrentArtistId();
         return artistAchievementService.updateAchievement(artistId, id, updateDto);
     }
 
@@ -90,31 +96,29 @@ public class ArtistAchievementController {
      * Удаление достижения текущего художника
      *
      * @param id             ID достижения
-     * @param authentication объект аутентификации Spring Security
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/me/achievements/{id}")
     @PreAuthorize("hasRole('ARTIST')")
     public void deleteAchievement(
-            @PathVariable Long id,
-            Authentication authentication) {
-        Long artistId = getCurrentArtistId(authentication);
+            @PathVariable Long id) {
+        Long artistId = getCurrentArtistId();
         artistAchievementService.deleteAchievement(artistId, id);
     }
 
     /**
      * Вспомогательный метод для получения ID текущего художника из контекста безопасности
      *
-     * @param authentication объект аутентификации
      * @return ID художника
      * @throws UsernameNotFoundException если пользователь не найден
      * @throws AccessDeniedException     если пользователь не является художником
      * @throws ResourceNotFoundException если профиль художника не найден
      */
-    private Long getCurrentArtistId(Authentication authentication) {
-        // Извлекаем пользователя по email из authentication
-        String email = authentication.getName();
-        User user = userRepository.findByUsername(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с email " + email + " не найден"));
+    private Long getCurrentArtistId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // Извлекаем текущего пользователя из SecurityContextHolder.getContext().getAuthentication().getPrincipal()
+        String username = authentication.getPrincipal().toString();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с username " + username + " не найден"));
 
         // Проверяем, что пользователь является художником
         if (!Role.ROLE_ARTIST.equals(user.getRole())) {
