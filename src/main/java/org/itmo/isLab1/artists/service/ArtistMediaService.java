@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.itmo.isLab1.artists.dto.*;
 import org.itmo.isLab1.artists.entity.ArtistProfile;
 import org.itmo.isLab1.artists.entity.Media;
+import org.itmo.isLab1.artists.entity.MediaTypeEnum;
 import org.itmo.isLab1.artists.entity.Work;
 import org.itmo.isLab1.artists.mapper.MediaMapper;
 import org.itmo.isLab1.artists.repository.ArtistProfileRepository;

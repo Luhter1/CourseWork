@@ -1,4 +1,4 @@
-package org.itmo.isLab1.artists.dto;
+package org.itmo.isLab1.artists.entity;
 
 public enum MediaTypeEnum {
     IMAGE,

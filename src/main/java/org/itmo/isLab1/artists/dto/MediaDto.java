@@ -1,5 +1,7 @@
 package org.itmo.isLab1.artists.dto;
 
+import org.itmo.isLab1.artists.entity.MediaTypeEnum;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Value;
 

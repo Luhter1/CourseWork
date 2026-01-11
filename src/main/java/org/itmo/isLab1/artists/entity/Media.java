@@ -10,7 +10,6 @@ import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.itmo.isLab1.common.entity.BaseEntity;
 import org.itmo.isLab1.utils.datetime.ZonedDateTimeConverter;
-import org.itmo.isLab1.artists.dto.MediaTypeEnum;
 
 import java.time.ZonedDateTime;
 
