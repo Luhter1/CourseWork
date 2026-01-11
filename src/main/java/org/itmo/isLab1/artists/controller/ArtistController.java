@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 
 /**
  * REST-контроллер для управления профилями художников
@@ -34,9 +35,11 @@ public class ArtistController {
      */
     @GetMapping
     @PreAuthorize("hasRole('ARTIST')")
-    public ArtistProfileResponse getMyProfile() {
+    public ResponseEntity<ArtistProfileResponse> getMyProfile() {
         var user = getCurrentUser();
-        return artistService.getArtistProfile(user);
+        var obj = artistService.getArtistProfile(user);
+
+        return ResponseEntity.ok(obj);
     }
 
     /**
@@ -48,9 +51,11 @@ public class ArtistController {
      */
     @PutMapping
     @PreAuthorize("hasRole('ARTIST')")
-    public ArtistProfileResponse updateMyProfile(@Valid @RequestBody ArtistProfileUpdateRequest request) {
+    public ResponseEntity<ArtistProfileResponse> updateMyProfile(@Valid @RequestBody ArtistProfileUpdateRequest request) {
         var user = getCurrentUser();
-        return artistService.updateArtistProfile(user, request);
+        var obj = artistService.updateArtistProfile(user, request);
+        
+        return ResponseEntity.ok(obj);
     }
 
     /**

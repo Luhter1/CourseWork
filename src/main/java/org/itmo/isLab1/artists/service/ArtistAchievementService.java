@@ -12,11 +12,10 @@ import org.itmo.isLab1.artists.repository.AchievementRepository;
 import org.itmo.isLab1.artists.repository.ArtistDetailsRepository;
 import org.itmo.isLab1.common.errors.PolicyViolationError;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Сервис для управления достижениями художников.
@@ -38,16 +37,14 @@ public class ArtistAchievementService {
      * @return список достижений в виде DTO
      * @throws ResourceNotFoundException если художник с указанным ID не найден
      */
-    public List<AchievementResponseDto> getArtistAchievements(Long artistId) {
+    public Page<AchievementResponseDto> getArtistAchievements(Long artistId, Pageable pageable) {
         // Проверяем существование художника
         artistDetailsRepository.findById(artistId)
                 .orElseThrow(() -> new ResourceNotFoundException("Художник с ID " + artistId + " не найден"));
 
         // Получаем все достижения и конвертируем в DTO
-        return achievementRepository.findByArtistIdOrderByCreatedAtDesc(artistId)
-                .stream()
-                .map(achievementMapper::toResponseDto)
-                .collect(Collectors.toList());
+        return achievementRepository.findByArtistIdOrderByCreatedAtDesc(artistId, pageable)
+            .map(achievementMapper::toResponseDto);
     }
 
     /**
