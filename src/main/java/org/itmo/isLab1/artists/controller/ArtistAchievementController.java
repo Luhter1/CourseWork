@@ -3,7 +3,7 @@ package org.itmo.isLab1.artists.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.itmo.isLab1.artists.dto.AchievementCreateDto;
-import org.itmo.isLab1.artists.dto.AchievementResponseDto;
+import org.itmo.isLab1.artists.dto.AchievementDto;
 import org.itmo.isLab1.artists.dto.AchievementUpdateDto;
 import org.itmo.isLab1.artists.entity.ArtistDetails;
 import org.itmo.isLab1.artists.repository.ArtistDetailsRepository;
@@ -48,7 +48,7 @@ public class ArtistAchievementController {
      * @return список достижений
      */
     @GetMapping("/{id}/achievements")
-    public ResponseEntity<Page<AchievementResponseDto>> getArtistAchievements(
+    public ResponseEntity<Page<AchievementDto>> getArtistAchievements(
         @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
         @PathVariable Long id
     ) {
@@ -72,7 +72,7 @@ public class ArtistAchievementController {
      */
     @GetMapping("/me/achievements")
     @PreAuthorize("hasRole('ARTIST')")
-    public ResponseEntity<Page<AchievementResponseDto>> getMyAchievements(
+    public ResponseEntity<Page<AchievementDto>> getMyAchievements(
         @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.ASC) Pageable pageable
     ) {
         Long artistId = getCurrentArtistId();
@@ -90,7 +90,7 @@ public class ArtistAchievementController {
      */
     @PostMapping("/me/achievements")
     @PreAuthorize("hasRole('ARTIST')")
-    public ResponseEntity<AchievementResponseDto> createAchievement(
+    public ResponseEntity<AchievementDto> createAchievement(
             @Valid AchievementCreateDto createDto) {
         Long artistId = getCurrentArtistId();
         var obj = artistAchievementService.createAchievement(artistId, createDto);
@@ -107,7 +107,7 @@ public class ArtistAchievementController {
      */
     @PutMapping("/me/achievements/{id}")
     @PreAuthorize("hasRole('ARTIST')")
-    public ResponseEntity<AchievementResponseDto> updateAchievement(
+    public ResponseEntity<AchievementDto> updateAchievement(
             @PathVariable Long id,
             @Valid AchievementUpdateDto updateDto) {
         Long artistId = getCurrentArtistId();

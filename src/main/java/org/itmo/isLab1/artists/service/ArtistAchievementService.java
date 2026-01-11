@@ -3,7 +3,7 @@ package org.itmo.isLab1.artists.service;
 import lombok.RequiredArgsConstructor;
 import org.itmo.isLab1.artists.AchievementMapper;
 import org.itmo.isLab1.artists.dto.AchievementCreateDto;
-import org.itmo.isLab1.artists.dto.AchievementResponseDto;
+import org.itmo.isLab1.artists.dto.AchievementDto;
 import org.itmo.isLab1.artists.dto.AchievementUpdateDto;
 import org.itmo.isLab1.artists.entity.Achievement;
 import org.itmo.isLab1.artists.entity.AchievementType;
@@ -37,7 +37,7 @@ public class ArtistAchievementService {
      * @return список достижений в виде DTO
      * @throws ResourceNotFoundException если художник с указанным ID не найден
      */
-    public Page<AchievementResponseDto> getArtistAchievements(Long artistId, Pageable pageable) {
+    public Page<AchievementDto> getArtistAchievements(Long artistId, Pageable pageable) {
         // Проверяем существование художника
         artistDetailsRepository.findById(artistId)
                 .orElseThrow(() -> new ResourceNotFoundException("Художник с ID " + artistId + " не найден"));
@@ -58,7 +58,7 @@ public class ArtistAchievementService {
      * @throws ResourceNotFoundException если художник с указанным ID не найден
      */
     @Transactional
-    public AchievementResponseDto createAchievement(Long artistId, AchievementCreateDto createDto) {
+    public AchievementDto createAchievement(Long artistId, AchievementCreateDto createDto) {
         // Проверяем, что тип не AUTO
         if (createDto.getType() == AchievementType.AUTO) {
             throw new PolicyViolationError("Нельзя создавать достижения с типом AUTO");
@@ -89,7 +89,7 @@ public class ArtistAchievementService {
      * @throws PolicyViolationError      если попытка обновить достижение с типом AUTO
      */
     @Transactional
-    public AchievementResponseDto updateAchievement(Long artistId, Long achievementId, AchievementUpdateDto updateDto) {
+    public AchievementDto updateAchievement(Long artistId, Long achievementId, AchievementUpdateDto updateDto) {
         // Находим достижение и проверяем принадлежность художнику
         Achievement achievement = achievementRepository.findByIdAndArtistId(achievementId, artistId)
                 .orElseThrow(() -> new ResourceNotFoundException(

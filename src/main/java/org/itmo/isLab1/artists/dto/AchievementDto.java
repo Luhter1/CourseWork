@@ -10,15 +10,10 @@ import org.itmo.isLab1.artists.entity.AchievementType;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AchievementResponseDto {
-    
+public class AchievementDto {
     private Long id;
-    
     private AchievementType type;
-    
     private String title;
-    
     private String description;
-    
     private String link;
 }
