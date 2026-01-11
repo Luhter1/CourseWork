@@ -1,13 +1,14 @@
 package org.itmo.isLab1.artists.service;
 
 import lombok.RequiredArgsConstructor;
-import org.itmo.isLab1.artists.AchievementMapper;
+
 import org.itmo.isLab1.artists.dto.AchievementCreateDto;
 import org.itmo.isLab1.artists.dto.AchievementDto;
 import org.itmo.isLab1.artists.dto.AchievementUpdateDto;
 import org.itmo.isLab1.artists.entity.Achievement;
 import org.itmo.isLab1.artists.entity.AchievementTypeEnum;
 import org.itmo.isLab1.artists.entity.ArtistProfile;
+import org.itmo.isLab1.artists.mapper.AchievementMapper;
 import org.itmo.isLab1.artists.repository.AchievementRepository;
 import org.itmo.isLab1.artists.repository.ArtistProfileRepository;
 import org.itmo.isLab1.common.errors.PolicyViolationError;

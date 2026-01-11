@@ -1,19 +1,19 @@
 package org.itmo.isLab1.artists.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.itmo.isLab1.artists.WorkMapper;
+
 import org.itmo.isLab1.artists.dto.*;
 import org.itmo.isLab1.artists.entity.ArtistProfile;
 import org.itmo.isLab1.artists.entity.Media;
 import org.itmo.isLab1.artists.entity.Work;
 import org.itmo.isLab1.artists.mapper.MediaMapper;
+import org.itmo.isLab1.artists.mapper.WorkMapper;
 import org.itmo.isLab1.artists.repository.ArtistProfileRepository;
 import org.itmo.isLab1.artists.repository.MediaRepository;
 import org.itmo.isLab1.artists.repository.WorkRepository;
 import org.itmo.isLab1.common.errors.PolicyViolationError;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
+import org.itmo.isLab1.common.minIO.MinioService;
 import org.itmo.isLab1.users.User;
 import org.itmo.isLab1.users.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -44,7 +43,6 @@ public class ArtistWorkService {
     private final MediaRepository mediaRepository;
     private final MediaMapper mediaMapper;
     private final MinioService minioService;
-    private final ObjectMapper objectMapper;
     
     @Value("${spring.minio.media.max-file-size:10485760}")
     private long maxFileSize;
@@ -182,7 +180,7 @@ public class ArtistWorkService {
             String presignedUrl = minioService.generatePresignedUrl(media.getUri(), 3600);
             // Создаем новый DTO с обновленным URI
             return new MediaDto(dto.getId(), presignedUrl, dto.getMediaType(),
-                               dto.getFileSize(), dto.getMetadata(), dto.getIsPrimary());
+                               dto.getFileSize());
         });
     }
 
@@ -214,17 +212,12 @@ public class ArtistWorkService {
                 // Определяем тип медиафайла
                 MediaTypeEnum mediaType = determineMediaType(file.getContentType());
                 
-                // Создаем метаданные
-                JsonNode metadata = createFileMetadata(file);
-                
                 // Создаем запись в базе данных
                 Media media = Media.builder()
                         .work(work)
                         .uri(objectName)
                         .mediaType(mediaType)
                         .fileSize(file.getSize())
-                        .metadata(metadata)
-                        .isPrimary(false)
                         .build();
                 
                 Media savedMedia = mediaRepository.save(media);
@@ -233,7 +226,7 @@ public class ArtistWorkService {
                 String presignedUrl = minioService.generatePresignedUrl(objectName, 3600);
                 MediaDto dto = mediaMapper.toDto(savedMedia);
                 MediaDto responseDto = new MediaDto(dto.getId(), presignedUrl, dto.getMediaType(),
-                                                  dto.getFileSize(), dto.getMetadata(), dto.getIsPrimary());
+                                                  dto.getFileSize());
                 
                 uploadedMedia.add(responseDto);
             }
@@ -357,25 +350,6 @@ public class ArtistWorkService {
             return MediaTypeEnum.VIDEO;
         }
         throw new PolicyViolationError("Неподдерживаемый тип файла: " + contentType);
-    }
-
-    /**
-     * Создает метаданные для файла.
-     *
-     * @param file загружаемый файл
-     * @return метаданные в формате JSON
-     */
-    private JsonNode createFileMetadata(MultipartFile file) {
-        try {
-            Map<String, Object> metadata = new HashMap<>();
-            metadata.put("originalFileName", file.getOriginalFilename());
-            metadata.put("contentType", file.getContentType());
-            metadata.put("uploadedAt", System.currentTimeMillis());
-            
-            return objectMapper.valueToTree(metadata);
-        } catch (Exception e) {
-            throw new RuntimeException("Ошибка при создании метаданных: " + e.getMessage(), e);
-        }
     }
 
     /**

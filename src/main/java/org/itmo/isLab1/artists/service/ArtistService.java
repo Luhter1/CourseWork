@@ -1,11 +1,12 @@
 package org.itmo.isLab1.artists.service;
 
 import lombok.RequiredArgsConstructor;
-import org.itmo.isLab1.artists.ArtistMapper;
+
 import org.itmo.isLab1.artists.dto.ArtistProfileCreateDto;
 import org.itmo.isLab1.artists.dto.ArtistProfileDto;
 import org.itmo.isLab1.artists.dto.ArtistProfileUpdateDto;
 import org.itmo.isLab1.artists.entity.ArtistProfile;
+import org.itmo.isLab1.artists.mapper.ArtistMapper;
 import org.itmo.isLab1.artists.repository.ArtistProfileRepository;
 import org.itmo.isLab1.common.errors.EntityDuplicateException;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;

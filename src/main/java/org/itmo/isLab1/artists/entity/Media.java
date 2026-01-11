@@ -11,7 +11,6 @@ import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.itmo.isLab1.common.entity.BaseEntity;
 import org.itmo.isLab1.utils.datetime.ZonedDateTimeConverter;
 import org.itmo.isLab1.artists.dto.MediaTypeEnum;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import java.time.ZonedDateTime;
 
@@ -44,17 +43,8 @@ public class Media implements BaseEntity {
     @ColumnTransformer(write = "?::art2art_media_type_enum")
     private MediaTypeEnum mediaType;
 
-    @Column(name = "metadata", columnDefinition = "JSONB")
-    private JsonNode metadata;
-
-    @Column(name = "checksum")
-    private String checksum;
-
     @Column(name = "file_size")
     private Long fileSize;
-
-    @Column(name = "is_primary", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private Boolean isPrimary = false;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
