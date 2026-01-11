@@ -5,7 +5,6 @@ import org.itmo.isLab1.common.mapper.ReferenceMapper;
 import org.itmo.isLab1.artists.dto.MediaDto;
 import org.itmo.isLab1.artists.entity.Media;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
@@ -17,7 +16,5 @@ import org.mapstruct.ReportingPolicy;
     unmappedTargetPolicy = ReportingPolicy.IGNORE
 )
 public interface MediaMapper {
-    
-    @Mapping(target = "work", ignore = true)
     MediaDto toDto(Media media);
 }

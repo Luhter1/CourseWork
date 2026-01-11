@@ -1,4 +1,4 @@
-package org.itmo.isLab1.artists;
+package org.itmo.isLab1.artists.mapper;
 
 import org.itmo.isLab1.common.mapper.JsonNullableMapper;
 import org.itmo.isLab1.common.mapper.ReferenceMapper;
