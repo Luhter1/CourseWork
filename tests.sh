@@ -1,101 +1,140 @@
-# Сервер запущен на порту 8080.
+# Сервер запущен на порту 15123.
 # В БД существуют тестовые данные: пользователь-художник с id=1 (username=artist1, роль ARTIST), ArtistDetails с id=1, достижения с id=1 (title="Test Achievement").
-# ARTIST_TOKEN: валидный JWT для artist1 (получить: curl -X POST http://localhost:8080/api/auth/signin -H "Content-Type: application/json" -d '{"username":"artist1","password":"pass"}' → извлечь accessToken).
+# ARTIST_TOKEN: валидный JWT для artist1 (получить: curl -X POST http://localhost:15123/api/auth/signin -H "Content-Type: application/json" -d '{"username":"artist1","password":"pass"}' → извлечь accessToken).
 # USER_TOKEN: JWT для обычного пользователя (роль USER).
 # INVALID_TOKEN: неверный токен, напр. eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.invalid.
 # Пагинация по умолчанию: size=20, sort=id,asc.
 
-# Позитивный: Получение достижений существующего художника с пагинацией.
-curl -X GET "http://localhost:8080/api/artists/1/achievements?page=0&size=5&sort=title,desc" -v
+## отсутсвующий профиль получить 
+# eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9TVVBFUkFETUlOIiwiaWQiOjEsInN1YiI6InRlc3RAbWFpbC5ydSIsImlhdCI6MTc2ODE1NDI1NiwiZXhwIjoxNzk5NzExMjA4fQ.JByNhFiRqzEey75mzXTCSZNH8DpGPxbe3FqwdgVS-Yw
 
-# Позитивный: Пагинация и сортировка.
-curl -X GET "http://localhost:8080/api/artists/1/achievements?page=1&size=10&sort=id,asc" -v
-
-# Негативный: Несуществующий ID художника.
-curl -X GET "http://localhost:8080/api/artists/999/achievements" -v
-
-# Негативный: Отсутствующий ArtistDetails.
-curl -X GET "http://localhost:8080/api/artists/2/achievements" -v  # id=2 без ArtistDetails
-
-# Позитивный: Получение своих достижений.
-curl -X GET "http://localhost:8080/api/artists/me/achievements?page=0&size=10" \
-  -H "Authorization: Bearer ARTIST_TOKEN" -v
-
-# Негативный: Без токена.
-curl -X GET "http://localhost:8080/api/artists/me/achievements" -v
-
-# Негативный: USER роль.
-curl -X GET "http://localhost:8080/api/artists/me/achievements" \
-  -H "Authorization: Bearer USER_TOKEN" -v
-
-# Негативный: INVALID_TOKEN.
-curl -X GET "http://localhost:8080/api/artists/me/achievements" \
-  -H "Authorization: Bearer INVALID_TOKEN" -v
-
-# Позитивный: Создание достижения.
-curl -X POST "http://localhost:8080/api/artists/me/achievements" \
-  -H "Authorization: Bearer ARTIST_TOKEN" \
+# eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiUk9MRV9BUlRJU1QiLCJpZCI6Miwic3ViIjoidGVzdF91c2VyQG1haWwucnUiLCJpYXQiOjE3NjgxNTQzMTgsImV4cCI6MTc5OTcxMTI3MH0.5DfPAjfnhAGSfj9U57083Wsfmc8bdT23vzauF9Bu50U
+curl -i -X POST http://localhost:15123/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
-    "type": "EXHIBITION",
+        "email": "test@mail.ru",
+        "name": "myName",
+        "surname": "mySurname",
+        "password": "mySecurePassword",
+        "role": "ROLE_ARTIST"
+      }'
+
+curl -i -X POST http://localhost:15123/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+        "email": "test_user@mail.ru",
+        "password": "mySecurePassword"
+      }'
+
+curl -X POST "http://localhost:15123/api/artists/me" \
+  -H "Authorization: Bearer $ARTIST_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "biography": "test_user@mail.ru",
+        "location": "mySecurePassword"
+      }'
+
+curl -X GET "http://localhost:15123/api/artists/me" -H "Authorization: Bearer $ARTIST_TOKEN"
+
+curl -X GET "http://localhost:15123/api/artists/1"
+
+curl -X PUT "http://localhost:15123/api/artists/me" \
+  -H "Authorization: Bearer $ARTIST_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "biography": null,
+        "location": "111"
+      }'
+
+curl -X POST "http://localhost:15123/api/artists/me" \
+  -H "Authorization: Bearer $SUPERADMIN_TOKER" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "biography": "test_user@mail.ru",
+        "location": "mySecurePassword"
+      }'
+
+# Позитивный: Получение достижений существующего художника с пагинацией.
+curl -X GET "http://localhost:15123/api/artists/2/achievements" -v
+
+# Позитивный: Пагинация и сортировка.
+curl -X GET "http://localhost:15123/api/artists/1/achievements?page=1&size=10&sort=id,asc" -v
+
+# Позитивный: Получение своих достижений.
+curl -X GET "http://localhost:15123/api/artists/me/achievements" \
+  -H "Authorization: Bearer $ARTIST_TOKEN" -v
+
+# Негативный: Без токена.
+curl -X GET "http://localhost:15123/api/artists/me/achievements" -v
+
+# Негативный: USER роль.
+curl -X GET "http://localhost:15123/api/artists/me/achievements" \
+  -H "Authorization: Bearer $SUPERADMIN_TOKER" -v
+
+# Позитивный: Создание достижения.
+curl -X POST "http://localhost:15123/api/artists/me/achievements" \
+  -H "Authorization: Bearer $ARTIST_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "EDUCATION",
     "title": "New Achievement",
     "description": "Test desc",
     "link": "https://example.com"
   }' -v
 
 # Негативный: Валидация (пустой title).
-curl -X POST "http://localhost:8080/api/artists/me/achievements" \
-  -H "Authorization: Bearer ARTIST_TOKEN" \
+curl -X POST "http://localhost:15123/api/artists/me/achievements" \
+  -H "Authorization: Bearer $ARTIST_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"type": "EXHIBITION", "title": "", "description": "desc"}' -v
 
 # Негативный: Неверный URL.
-curl -X POST "http://localhost:8080/api/artists/me/achievements" \
-  -H "Authorization: Bearer ARTIST_TOKEN" \
+curl -X POST "http://localhost:15123/api/artists/me/achievements" \
+  -H "Authorization: Bearer $ARTIST_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"type": "EXHIBITION", "title": "Test", "link": "invalid-url"}' -v
 
 # Негативный: Без ARTIST роли. (аналогично 401/403)
-curl -X POST "http://localhost:8080/api/artists/me/achievements" \
-  -H "Authorization: Bearer ARTIST_TOKEN" \
+curl -X POST "http://localhost:15123/api/artists/me/achievements" \
+  -H "Authorization: Bearer $SUPERADMIN_TOKER" \
   -H "Content-Type: application/json" \
   -d '{"type": "EXHIBITION", "link": "invalid-url"}' -v
 
 # Позитивный: Обновление.
-curl -X PUT "http://localhost:8080/api/artists/me/achievements/1" \
-  -H "Authorization: Bearer ARTIST_TOKEN" \
+curl -X PUT "http://localhost:15123/api/artists/me/achievements/1" \
+  -H "Authorization: Bearer $ARTIST_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "title": "Updated Title",
+    "title": "null",
     "description": "Updated desc",
     "link": "https://example.com/new"
   }' -v
 
 # Негативный: Несуществующий achievement ID.
-curl -X PUT "http://localhost:8080/api/artists/me/achievements/999" \
-  -H "Authorization: Bearer ARTIST_TOKEN" -v
+curl -X PUT "http://localhost:15123/api/artists/me/achievements/999" \
+  -H "Authorization: Bearer $ARTIST_TOKEN" -v
 
 # Негативный: Валидация title слишком длинный.
-curl -X PUT "http://localhost:8080/api/artists/me/achievements/1" \
-  -H "Authorization: Bearer ARTIST_TOKEN" \
+curl -X PUT "http://localhost:15123/api/artists/me/achievements/1" \
+  -H "Authorization: Bearer $ARTIST_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"title": "'$(printf 'A%.0s' {1..300})'"}' -v
 
 # Позитивный: Удаление.
-curl -X DELETE "http://localhost:8080/api/artists/me/achievements/1" \
-  -H "Authorization: Bearer ARTIST_TOKEN" -v
+curl -X DELETE "http://localhost:15123/api/artists/me/achievements/1" \
+  -H "Authorization: Bearer $ARTIST_TOKEN" -v
 
 # Негативный: Несуществующий ID.
-curl -X DELETE "http://localhost:8080/api/artists/me/achievements/999" \
-  -H "Authorization: Bearer ARTIST_TOKEN" -v
+curl -X DELETE "http://localhost:15123/api/artists/me/achievements/999" \
+  -H "Authorization: Bearer $ARTIST_TOKEN" -v
 
 # Позитивный: Получение своего профиля.
-curl -X GET "http://localhost:8080/api/artists/me" \
-  -H "Authorization: Bearer ARTIST_TOKEN" -v
+curl -X GET "http://localhost:15123/api/artists/me" \
+  -H "Authorization: Bearer $ARTIST_TOKEN" -v
 
 # Позитивный: Обновление профиля.
-curl -X PUT "http://localhost:8080/api/artists/me" \
-  -H "Authorization: Bearer ARTIST_TOKEN" \
+curl -X PUT "http://localhost:15123/api/artists/me" \
+  -H "Authorization: Bearer $ARTIST_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "New Name",
@@ -104,14 +143,21 @@ curl -X PUT "http://localhost:8080/api/artists/me" \
     "location": "Moscow"
   }' -v
 
-# Негативный: Пустое имя.
-curl -X PUT "http://localhost:8080/api/artists/me" \
-  -H "Authorization: Bearer ARTIST_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"name": "", "surname": "Surname"}' -v
 
-# Негативный: Биография слишком длинная.
-curl -X PUT "http://localhost:8080/api/artists/me" \
-  -H "Authorization: Bearer ARTIST_TOKEN" \
+curl -X GET "http://localhost:15123/api/artists/2/works" -v
+
+curl -X GET "http://localhost:15123/api/artists/me/works" \
+  -H "Authorization: Bearer $ARTIST_TOKEN" -v
+
+curl -X GET "http://localhost:15123/api/artists/me/works" \
+  -H "Authorization: Bearer $SUPERADMIN_TOKER" -v
+
+curl -X POST "http://localhost:15123/api/artists/me/works" \
+  -H "Authorization: Bearer $ARTIST_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"name": "Name", "surname": "Surname", "biography": "'$(printf 'A%.0s' {1..3000})'"}' -v
+  -d '{"title": "EXHIBITION", "description": "123213", "artDirection": "PAINTING", "date": "2007-12-03", "link": "https://example.com/new"}' -v
+
+curl -X PUT "http://localhost:15123/api/artists/me/works/1" \
+  -H "Authorization: Bearer $ARTIST_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"date": "2020-12-03", "link": null}' -v

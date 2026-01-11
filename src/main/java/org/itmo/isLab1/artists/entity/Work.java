@@ -8,7 +8,9 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.validator.constraints.URL;
 import org.itmo.isLab1.common.entity.BaseEntity;
 import org.itmo.isLab1.utils.datetime.ZonedDateTimeConverter;
@@ -47,6 +49,7 @@ public class Work implements BaseEntity {
     private String link;
 
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(name = "art_direction", nullable = false)
     @NotNull(message = "Art direction is required")
     @ColumnTransformer(write="?::art2art_art_direction_enum")
