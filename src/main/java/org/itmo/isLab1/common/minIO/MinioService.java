@@ -1,4 +1,4 @@
-package org.itmo.isLab1.artists.service;
+package org.itmo.isLab1.common.minIO;
 
 import io.minio.*;
 import io.minio.errors.*;
@@ -7,12 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.ErrorResponseException;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -40,31 +38,36 @@ public class MinioService {
      * @throws RuntimeException если произошла ошибка при загрузке
      */
     public String uploadFile(MultipartFile file, Long artistId, Long workId) {
-        try {
-            ensureBucketExists();
-            
-            String fileName = generateFileName(file.getOriginalFilename(), artistId, workId);
-            String objectName = String.format("artist-%d/work-%d/%s", artistId, workId, fileName);
-            
-            InputStream inputStream = file.getInputStream();
-            
-            PutObjectArgs args = PutObjectArgs.builder()
-                    .bucket(bucketName)
-                    .object(objectName)
-                    .stream(inputStream, file.getSize(), -1)
-                    .contentType(file.getContentType())
-                    .build();
-            
-            ObjectWriteResponse response = minioClient.putObject(args);
-            
-            log.info("Файл успешно загружен в MinIO: bucket={}, object={}, etag={}", 
-                    bucketName, objectName, response.etag());
-            
+        String objectName = String.format(
+                "artist-%d/work-%d/%s",
+                artistId,
+                workId,
+                generateFileName(file.getOriginalFilename())
+        );
+
+        try (InputStream inputStream = file.getInputStream()) {
+
+            ObjectWriteResponse response = minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(objectName)
+                            .stream(inputStream, file.getSize(), -1)
+                            .contentType(file.getContentType())
+                            .build()
+            );
+
+            log.info(
+                    "Файл успешно загружен в MinIO: bucket={}, object={}, etag={}",
+                    bucketName,
+                    objectName,
+                    response.etag()
+            );
+
             return objectName;
-            
+
         } catch (Exception e) {
-            log.error("Ошибка при загрузке файла в MinIO: {}", e.getMessage(), e);
-            throw new RuntimeException("Ошибка при загрузке файла: " + e.getMessage(), e);
+            log.error("Ошибка при загрузке файла в MinIO", e);
+            throw new RuntimeException("Ошибка при загрузке файла", e);
         }
     }
 
@@ -77,26 +80,16 @@ public class MinioService {
      */
     public void deleteFile(String objectName) {
         try {
-            // Проверяем, существует ли файл
-            StatObjectArgs statArgs = StatObjectArgs.builder()
-                    .bucket(bucketName)
-                    .object(objectName)
-                    .build();
-            
-            minioClient.statObject(statArgs);
-            
-            // Удаляем файл
-            RemoveObjectArgs removeArgs = RemoveObjectArgs.builder()
-                    .bucket(bucketName)
-                    .object(objectName)
-                    .build();
-            
-            minioClient.removeObject(removeArgs);
-            
+            minioClient.removeObject(
+                RemoveObjectArgs.builder()
+                        .bucket(bucketName)
+                        .object(objectName)
+                       .build()
+            );
             log.info("Файл успешно удален из MinIO: bucket={}, object={}", bucketName, objectName);
             
         } catch (ErrorResponseException e) {
-            if (e.errorResponse().code().equals("NoSuchKey")) {
+            if ("NoSuchKey".equals(e.errorResponse().code())) {
                 throw new ResourceNotFoundException("Файл не найден в хранилище: " + objectName);
             }
             log.error("Ошибка при удалении файла из MinIO: {}", e.getMessage(), e);
@@ -115,13 +108,15 @@ public class MinioService {
      * @return предварительно подписанный URL
      * @throws RuntimeException если произошла ошибка при генерации URL
      */
-    public String generatePresignedUrl(String objectName, int expiry) {
+    public String generatePresignedUrl(String objectName) {
+        ensureObjectExists(objectName);
+
         try {
             GetPresignedObjectUrlArgs args = GetPresignedObjectUrlArgs.builder()
                     .method(Method.GET)
                     .bucket(bucketName)
                     .object(objectName)
-                    .expiry(expiry, TimeUnit.SECONDS)
+                    .expiry(86400, TimeUnit.SECONDS)
                     .build();
             
             String url = minioClient.getPresignedObjectUrl(args);
@@ -136,31 +131,21 @@ public class MinioService {
         }
     }
 
-    /**
-     * Проверяет и при необходимости создает bucket
-     *
-     * @throws RuntimeException если произошла ошибка при создании bucket
-     */
-    private void ensureBucketExists() {
+    private void ensureObjectExists(String objectName) {
         try {
-            BucketExistsArgs existsArgs = BucketExistsArgs.builder()
-                    .bucket(bucketName)
-                    .build();
-            
-            boolean bucketExists = minioClient.bucketExists(existsArgs);
-            
-            if (!bucketExists) {
-                MakeBucketArgs makeArgs = MakeBucketArgs.builder()
-                        .bucket(bucketName)
-                        .build();
-                
-                minioClient.makeBucket(makeArgs);
-                log.info("Создан новый bucket в MinIO: {}", bucketName);
+            minioClient.statObject(
+                    StatObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(objectName)
+                            .build()
+            );
+        } catch (ErrorResponseException e) {
+            if ("NoSuchKey".equals(e.errorResponse().code())) {
+                throw new ResourceNotFoundException("Файл не найден: " + objectName);
             }
-            
+            throw new RuntimeException("Ошибка проверки существования файла", e);
         } catch (Exception e) {
-            log.error("Ошибка при проверке/создании bucket: {}", e.getMessage(), e);
-            throw new RuntimeException("Ошибка при работе с bucket: " + e.getMessage(), e);
+            throw new RuntimeException("Ошибка проверки существования файла", e);
         }
     }
 
@@ -168,11 +153,9 @@ public class MinioService {
      * Генерирует уникальное имя файла
      *
      * @param originalFileName оригинальное имя файла
-     * @param artistId идентификатор художника
-     * @param workId идентификатор работы
      * @return сгенерированное имя файла
      */
-    private String generateFileName(String originalFileName, Long artistId, Long workId) {
+    private String generateFileName(String originalFileName) {
         String extension = "";
         if (originalFileName != null && originalFileName.contains(".")) {
             extension = originalFileName.substring(originalFileName.lastIndexOf("."));
