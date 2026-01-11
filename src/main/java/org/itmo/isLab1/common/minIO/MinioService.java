@@ -2,7 +2,9 @@ package org.itmo.isLab1.common.minIO;
 
 import io.minio.*;
 import io.minio.http.Method;
+import jakarta.annotation.PostConstruct;
 import io.minio.errors.*;
+import io.minio.errors.ErrorResponseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
@@ -165,5 +167,23 @@ public class MinioService {
         String uuid = UUID.randomUUID().toString().substring(0, 8);
         
         return String.format("%s_%s%s", timestamp, uuid, extension);
+    }
+
+    @PostConstruct
+    public void ensureBucketExists() {
+        try {
+            boolean exists = minioClient.bucketExists(
+                    BucketExistsArgs.builder().bucket(bucketName).build()
+            );
+            if (!exists) {
+                minioClient.makeBucket(
+                        MakeBucketArgs.builder().bucket(bucketName).build()
+                );
+                log.info("Бакет '{}' создан", bucketName);
+            }
+        } catch (Exception e) {
+            log.error("Не удалось проверить/создать бакет '{}'", bucketName, e);
+            throw new RuntimeException(e);
+        }
     }
 }

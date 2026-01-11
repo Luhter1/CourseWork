@@ -24,6 +24,11 @@ CREATE TYPE art2art_achievements_type_enum AS ENUM (
     'AUTO'
 );
 
+CREATE TYPE art2art_media_type_enum AS ENUM (
+    'IMAGE',
+    'VIDEO'
+);
+
 -- таблица пользователей
 CREATE TABLE art2art_users (
     id              BIGSERIAL PRIMARY KEY,
@@ -161,7 +166,7 @@ CREATE TABLE art2art_media (
     -- если удалены работы, то и медиа тоже надо
     work_id         BIGINT NOT NULL REFERENCES art2art_portfolio_works(id) ON DELETE CASCADE,
     uri             TEXT NOT NULL,
-    media_type      VARCHAR(50) CHECK (media_type IN ('image', 'video')),
+    media_type      art2art_media_type_enum NOT NULL,
     file_size       BIGINT,
     created_at      TIMESTAMP DEFAULT now()
 );

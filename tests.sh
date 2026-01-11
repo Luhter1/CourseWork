@@ -143,7 +143,7 @@ curl -X PUT "http://localhost:15123/api/artists/me" \
     "location": "Moscow"
   }' -v
 
-
+# работы в портфолио
 curl -X GET "http://localhost:15123/api/artists/2/works" -v
 
 curl -X GET "http://localhost:15123/api/artists/me/works" \
@@ -161,3 +161,9 @@ curl -X PUT "http://localhost:15123/api/artists/me/works/1" \
   -H "Authorization: Bearer $ARTIST_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"date": "2020-12-03", "link": null}' -v
+
+# файлы
+curl -X POST "http://localhost:15123/api/artists/me/works/1/media" \
+  -H "Authorization: Bearer $ARTIST_TOKEN" \
+  -H "Content-Type: multipart/form-data" \
+  -F "files=@component_diagram.drawio.png"
