@@ -38,6 +38,7 @@ public interface ArtistMapper {
     @Mapping(source = "location", target = "location")
     void updateArtistDetailsFromRequest(ArtistProfileUpdateDto request, @MappingTarget ArtistProfile details);
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(source = "user", target = "user")
     @Mapping(source = "request.biography", target = "biography")
     @Mapping(source = "request.location", target = "location")

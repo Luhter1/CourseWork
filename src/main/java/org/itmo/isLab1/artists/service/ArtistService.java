@@ -72,7 +72,6 @@ public class ArtistService {
         
         // Сохраняем ArtistDetails
         ArtistProfile savedDetails = artistDetailsRepository.save(details);
-        System.out.println("\n\n\n HELLO \n\n\n");
         
         // Возвращаем профиль
         return artistMapper.toProfileResponse(user, savedDetails);

@@ -23,6 +23,7 @@ import org.mapstruct.ReportingPolicy;
 public interface WorkMapper {
     WorkDto toResponseDto(Work work);
     
+    @Mapping(target = "id", ignore = true)
     @Mapping(source = "artist", target = "artist")
     @Mapping(source = "createDto.title", target = "title")
     @Mapping(source = "createDto.description", target = "description")
