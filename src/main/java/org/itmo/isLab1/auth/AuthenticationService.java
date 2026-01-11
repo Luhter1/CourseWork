@@ -29,9 +29,9 @@ public class AuthenticationService {
     public AuthenticationDto signUp(SignUpDto request) {
         Role role = request.getRole() == Role.ROLE_SUPERADMIN ? Role.ROLE_ARTIST : request.getRole();
         var user = User.builder()
-            .username(request.getUsername())
-            .name(request.getUsername())
-            .surname(request.getUsername())
+            .username(request.getEmail())
+            .name(request.getName())
+            .surname(request.getSurname())
             .password(passwordEncoder.encode(request.getPassword()))
             .role(role)
             .is_active(true)
@@ -47,10 +47,10 @@ public class AuthenticationService {
      */
     @Transactional
     public AuthenticationDto signIn(SignInDto request) {
-        var user = userService.getByUsername(request.getUsername());
+        var user = userService.getByUsername(request.getEmail());
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-            request.getUsername(),
+            request.getEmail(),
             request.getPassword()
         ));
 
