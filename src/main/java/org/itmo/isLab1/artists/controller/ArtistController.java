@@ -6,6 +6,7 @@ import org.itmo.isLab1.artists.dto.ArtistProfileResponse;
 import org.itmo.isLab1.artists.dto.ArtistProfileUpdateRequest;
 import org.itmo.isLab1.artists.service.ArtistService;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -25,6 +26,7 @@ public class ArtistController {
      * @return профиль художника
      */
     @GetMapping("/me")
+    @PreAuthorize("hasRole('ARTIST')")
     public ArtistProfileResponse getMyProfile(Authentication authentication) {
         return artistService.getArtistProfile(authentication);
     }
@@ -37,6 +39,7 @@ public class ArtistController {
      * @return обновленный профиль художника
      */
     @PutMapping("/me")
+    @PreAuthorize("hasRole('ARTIST')")
     public ArtistProfileResponse updateMyProfile(
             @Valid @RequestBody ArtistProfileUpdateRequest request,
             Authentication authentication) {

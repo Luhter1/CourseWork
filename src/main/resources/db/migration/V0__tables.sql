@@ -17,13 +17,11 @@ CREATE TYPE art2art_art_direction_enum AS ENUM (
 );
 
 CREATE TYPE art2art_achievements_type_enum AS ENUM (
-    'painting',
-    'sculpture',
-    'performance',
-    'multimedia',
-    'digital_art',
-    'photo',
-    'other'
+    'education',
+    'exhibition',
+    'publication',
+    'award',
+    'auto'
 );
 
 -- таблица пользователей
