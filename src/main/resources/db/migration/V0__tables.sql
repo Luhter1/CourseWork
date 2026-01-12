@@ -29,6 +29,16 @@ CREATE TYPE art2art_media_type_enum AS ENUM (
     'VIDEO'
 );
 
+CREATE TYPE art2art_application_request_status AS ENUM (
+    'SENT', 
+    'REVIEWED',
+    'APPROVED', 
+    'RESERVE',
+    'REJECTED',
+    'CONFIRMED', 
+    'DECLINED_BY_ARTIST'
+);
+
 -- таблица пользователей
 CREATE TABLE art2art_users (
     id              BIGSERIAL PRIMARY KEY,
@@ -123,9 +133,7 @@ CREATE TABLE art2art_application_requests (
     -- TODO: возможно надо добавить ограничение на добавление только с ролью ROLE_ARTIST
     -- если художник участвовал в программе, его нельзя удалять
     artist_id        BIGINT NOT NULL REFERENCES art2art_users(id) ON DELETE RESTRICT,
-    status           VARCHAR(50) NOT NULL CHECK (status IN (
-                        'sent', 'reviewed', 'approved', 'reserve',
-                        'rejected', 'confirmed', 'declined_by_artist')),
+    status           art2art_application_request_status NOT NULL,
     submitted_at     TIMESTAMP DEFAULT now(),
     created_at       TIMESTAMP DEFAULT now(),
     -- требование, чтобы художник мог подать заявку только 1 раз
