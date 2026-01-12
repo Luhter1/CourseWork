@@ -3,7 +3,6 @@ package org.itmo.isLab1.common.minIO;
 import io.minio.*;
 import io.minio.http.Method;
 import jakarta.annotation.PostConstruct;
-import io.minio.errors.*;
 import io.minio.errors.ErrorResponseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
