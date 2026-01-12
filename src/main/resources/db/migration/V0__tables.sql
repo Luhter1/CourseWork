@@ -39,6 +39,12 @@ CREATE TYPE art2art_application_request_status AS ENUM (
     'DECLINED_BY_ARTIST'
 );
 
+CREATE TYPE art2art_validation_requests_status AS ENUM (
+    'PENDING', 
+    'APPROVED', 
+    'REJECTED'
+);
+
 -- таблица пользователей
 CREATE TABLE art2art_users (
     id              BIGSERIAL PRIMARY KEY,
@@ -65,29 +71,19 @@ CREATE TABLE art2art_artist_details (
 
 -- таблица резиденций
 CREATE TABLE art2art_residence_details (
-    id              BIGSERIAL PRIMARY KEY,
+    id                      BIGSERIAL PRIMARY KEY,
     -- удаление администратора резиденции не должно автоматически удалять саму резиденцию
-    user_id         BIGINT UNIQUE NOT NULL REFERENCES art2art_users(id) ON DELETE RESTRICT,
-    title           VARCHAR(255) NOT NULL,
-    description     TEXT,
-    contacts        JSONB,
-    location        VARCHAR(255),
-    is_published    BOOLEAN DEFAULT FALSE,
-    created_at      TIMESTAMP DEFAULT now(),
-    updated_at      TIMESTAMP DEFAULT now()
-);
-
--- таблица заявок на валидацию резиденции
-CREATE TABLE art2art_validation_requests (
-    id               BIGSERIAL PRIMARY KEY,
-    -- если удаляют резиденцию, то все её заявки на валидацию теряют смысл
-    residence_id     BIGINT NOT NULL REFERENCES art2art_residence_details(id) ON DELETE CASCADE,
-    status           VARCHAR(50) NOT NULL CHECK (status IN ('pending', 'approved', 'rejected')),
-    comment          TEXT,
-    submitted_at     TIMESTAMP,
-    processed_at     TIMESTAMP,
-    updated_at       TIMESTAMP,
-    created_at       TIMESTAMP DEFAULT now()
+    user_id                 BIGINT UNIQUE NOT NULL REFERENCES art2art_users(id) ON DELETE RESTRICT,
+    title                   VARCHAR(255) NOT NULL,
+    description             TEXT,
+    contacts                JSONB,
+    location                VARCHAR(255),
+    is_published            BOOLEAN NOT NULL DEFAULT FALSE,
+    validation_status       art2art_validation_requests_status NOT NULL,
+    validation_comment      TEXT,
+    validation_submitted_at TIMESTAMP,
+    created_at              TIMESTAMP DEFAULT now(),
+    updated_at              TIMESTAMP DEFAULT now()
 );
 
 -- таблица программ
