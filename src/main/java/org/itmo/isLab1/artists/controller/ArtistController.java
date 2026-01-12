@@ -6,6 +6,8 @@ import org.itmo.isLab1.artists.dto.ArtistProfileDto;
 import org.itmo.isLab1.artists.dto.ArtistProfileUpdateDto;
 import org.itmo.isLab1.artists.dto.ArtistProfileCreateDto;
 import org.itmo.isLab1.artists.service.ArtistService;
+import org.itmo.isLab1.common.notifications.dto.NotificationsDto;
+import org.itmo.isLab1.common.notifications.service.NotificationService;
 import org.itmo.isLab1.users.User;
 import org.itmo.isLab1.users.UserRepository;
 import org.springframework.security.core.Authentication;
@@ -29,6 +31,7 @@ import org.springframework.http.ResponseEntity;
 public class ArtistController {
 
     private final ArtistService artistService;
+    private final NotificationService notificationService;
     private final UserRepository userRepository;
 
     /**
@@ -97,6 +100,17 @@ public class ArtistController {
         var obj = artistService.updateArtistProfile(request);
         
         return ResponseEntity.ok(obj);
+    }
+
+    @PostMapping("/{id}/invite")
+    @PreAuthorize("hasRole('RESIDENCE_ADMIN')")
+    public ResponseEntity<Long> inviteArtist(
+            @PathVariable Long id,
+            @Valid @RequestBody NotificationsDto request) {
+
+        Long notificationId = notificationService.sendInviteNotification(request);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(notificationId);
     }
 
     /**
