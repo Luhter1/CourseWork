@@ -2,7 +2,7 @@
 -- Создаем уведомление
 ----------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION create_notification(
-    p_user_id BIGINT,
+    p_email VARCHAR,
     p_message TEXT,
     p_category VARCHAR,
     p_link TEXT DEFAULT NULL
@@ -11,10 +11,23 @@ LANGUAGE plpgsql
 AS $$
 DECLARE
     v_id BIGINT;
+    v_user_id BIGINT;
 BEGIN
+    -- Находим пользователя по email
+    SELECT id INTO v_user_id
+    FROM art2art_users
+    WHERE email = p_email
+    LIMIT 1;
+
+    IF v_user_id IS NULL THEN
+        RAISE EXCEPTION 'Пользователь с email "%" не найден', p_email;
+    END IF;
+
+    -- Создаем уведомление
     INSERT INTO art2art_notifications (user_id, message, category, link, created_at)
-    VALUES (p_user_id, p_message, p_category, p_link, now())
+    VALUES (v_user_id, p_message, p_category, p_link, now())
     RETURNING id INTO v_id;
+    
     RETURN v_id;
 END;
 $$;
