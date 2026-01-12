@@ -54,3 +54,31 @@ CREATE TRIGGER trg_program_application
 AFTER INSERT ON art2art_application_requests
 FOR EACH ROW
 EXECUTE FUNCTION increment_applications_count();
+
+
+-- автоматическая публикация резиденции при одобрении заявки на валидацию
+CREATE OR REPLACE FUNCTION update_residence_publish_status()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Обновляем резиденцию, устанавливая is_published = TRUE
+    UPDATE art2art_residence_details
+    SET is_published = TRUE,
+        updated_at = now()
+    WHERE id = NEW.residence_id;
+    
+    -- Обновляем время обработки заявки (отдельным UPDATE, т.к. это AFTER UPDATE триггер)
+    -- Условие в WHERE предотвращает рекурсию, т.к. processed_at уже будет установлен
+    UPDATE art2art_validation_requests
+    SET processed_at = COALESCE(processed_at, now()),
+        updated_at = now()
+    WHERE id = NEW.id AND processed_at IS NULL;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_validation_request_approved
+AFTER UPDATE ON art2art_validation_requests
+FOR EACH ROW
+WHEN (NEW.status = 'approved' AND OLD.status IS DISTINCT FROM 'approved')
+EXECUTE FUNCTION update_residence_publish_status();

@@ -471,3 +471,133 @@ BEGIN
     RETURN round(v_avg::numeric, 2);
 END;
 $$;
+
+----------------------------------------------------------------------
+-- Атомарное создание профиля резиденции и заявки на валидацию
+-- Функция выполняет следующие действия в одной транзакции:
+--   1. Проверяет, что пользователь существует и имеет роль ROLE_RESIDENCE_ADMIN
+--   2. Проверяет, что у пользователя еще нет профиля резиденции
+--   3. Создает запись в таблице art2art_residence_details
+--   4. Создает заявку на валидацию со статусом 'pending'
+--   5. Возвращает идентификатор созданной резиденции
+--
+-- Параметры:
+--   p_title         - название резиденции (обязательно)
+--   p_description   - описание резиденции
+--   p_location      - местоположение резиденции
+--   p_contacts      - контактная информация в формате JSONB
+--   p_is_published  - статус публикации (параметр игнорируется, всегда устанавливается FALSE
+--                     до одобрения заявки на валидацию)
+--   p_user_id       - идентификатор пользователя-администратора резиденции
+--
+-- Возвращает: идентификатор созданной резиденции
+--
+-- Обработка ошибок:
+--   - если пользователь не найден или неактивен
+--   - если пользователь не имеет роль ROLE_RESIDENCE_ADMIN
+--   - если у пользователя уже есть профиль резиденции
+--   - если название резиденции пустое
+----------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION create_residence_profile(
+    p_title VARCHAR(255),
+    p_description TEXT,
+    p_location VARCHAR(255),
+    p_contacts JSONB,
+    p_is_published BOOLEAN,
+    p_user_id BIGINT
+) RETURNS BIGINT
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_user_role art2art_user_role_enum;
+    v_existing_residence BIGINT;
+    v_residence_id BIGINT;
+    v_validation_id BIGINT;
+BEGIN
+    -- 1. Проверить, что пользователь существует и имеет роль ROLE_RESIDENCE_ADMIN
+    SELECT role INTO v_user_role
+    FROM art2art_users
+    WHERE id = p_user_id AND is_active = TRUE;
+    
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Пользователь с id % не найден или неактивен', p_user_id;
+    END IF;
+    
+    IF v_user_role <> 'ROLE_RESIDENCE_ADMIN' THEN
+        RAISE EXCEPTION 'Пользователь % не имеет роль ROLE_RESIDENCE_ADMIN. Текущая роль: %', p_user_id, v_user_role;
+    END IF;
+    
+    -- 2. Проверить, что у пользователя еще нет профиля резиденции
+    SELECT id INTO v_existing_residence
+    FROM art2art_residence_details
+    WHERE user_id = p_user_id;
+    
+    IF FOUND THEN
+        RAISE EXCEPTION 'У пользователя % уже существует профиль резиденции с id %', p_user_id, v_existing_residence;
+    END IF;
+    
+    -- Проверка обязательных полей
+    IF p_title IS NULL OR trim(p_title) = '' THEN
+        RAISE EXCEPTION 'Название резиденции не может быть пустым';
+    END IF;
+    
+    -- 3. Создать запись в таблице art2art_residence_details
+    -- Примечание: параметр p_is_published игнорируется.
+    -- is_published всегда устанавливается в FALSE при создании и изменится на TRUE
+    -- только после одобрения заявки на валидацию (через триггер trg_validation_request_approved)
+    INSERT INTO art2art_residence_details (
+        user_id,
+        title,
+        description,
+        location,
+        contacts,
+        is_published,
+        created_at,
+        updated_at
+    )
+    VALUES (
+        p_user_id,
+        p_title,
+        p_description,
+        p_location,
+        p_contacts,
+        FALSE,  -- всегда FALSE до одобрения валидации
+        now(),
+        now()
+    )
+    RETURNING id INTO v_residence_id;
+    
+    -- Создать запись статистики для резиденции
+    INSERT INTO art2art_residence_stats (residence_id, views_count, created_at, updated_at)
+    VALUES (v_residence_id, 0, now(), now())
+    ON CONFLICT (residence_id) DO NOTHING;
+    
+    -- 4. Создать заявку на валидацию со статусом 'pending'
+    INSERT INTO art2art_validation_requests (
+        residence_id,
+        status,
+        submitted_at,
+        created_at,
+        updated_at
+    )
+    VALUES (
+        v_residence_id,
+        'pending',
+        now(),
+        now(),
+        now()
+    )
+    RETURNING id INTO v_validation_id;
+    
+    -- Создать уведомление для администратора резиденции
+    PERFORM create_notification(
+        (SELECT email FROM art2art_users WHERE id = p_user_id),
+        format('Профиль резиденции "%s" создан. Заявка на валидацию #%s отправлена на рассмотрение', p_title, v_validation_id),
+        'status',
+        NULL
+    );
+    
+    -- 5. Вернуть идентификатор созданной резиденции
+    RETURN v_residence_id;
+END;
+$$;

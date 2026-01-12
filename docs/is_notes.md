@@ -48,18 +48,17 @@
       - Текстовое поле `описание`
       - Выпадающий список `направление искусства` (painting, sculpture, performance, multimedia, digital_art, photo, other)
       - Выбор даты `дата создания`
-      - Загрузка файлов `изображения` (JPEG, PNG, до 10 МБ)
-      - Загрузка файлов `видео` (MP4)
       - Поле ввода `ссылки на внешние ресурсы` (множественное)
       - Кнопка "Сохранить" > `POST /api/artists/me/works`
-   - Drag-and-drop список работ > `PUT /api/artists/me/works/reorder`:
-      - Превью работы
-      - Текст `название`
       - Кнопка "Редактировать" > Попап "Редактирование работы":
          - (аналогично созданию)
          - Кнопка "Сохранить" > `PUT /api/artists/me/works/{id}`
-         - Кнопка "Удалить медиа" > `DELETE /api/artists/me/works/{id}/media/{mediaId}`
-      - Кнопка "Удалить" > `DELETE /api/artists/me/works/{id}`
+         - Кнопка "Удалить" > `DELETE /api/artists/me/works/{id}`
+   - Медиа "Работы" < `GET /api/artists/me/works/{id}/media`
+      - Загрузка файлов `изображения` (JPEG, PNG, до 10 МБ)
+      - Загрузка файлов `видео` (MP4)
+      - Кнопка "Сохранить" > `POST /api/artists/me/works/{id}/media`
+      - Кнопка "Удалить медиа" > `DELETE /api/artists/me/works/{id}/media/{mediaId}`
 - Секция "Достижения" < `GET /api/artists/me/achievements`:
    - Кнопка "Добавить достижение" > Попап "Создание достижения":
       - Выпадающий список `тип` (education, exhibition, publication, award)
@@ -206,16 +205,18 @@
 
 ## администратор резиденции (АР)
 
-### 13. АР: Профиль резиденции < `GET /api/residences/me`, `GET /api/residences/me/validation-status`
+### 13. АР: Профиль резиденции < `GET /api/residences/me`, `GET /api/residences/{id}`
 - Поле ввода `наименование`
 - Текстовое поле `описание`
 - Поле ввода `местоположение`
 - Текстовое поле `контактные данные`
-- Бейдж `статус валидации` (pending, approved, rejected)
-- Текст `комментарий суперадмина` (при rejected)
-- Текст "Публикация заблокирована до одобрения" (при pending/rejected)
-- Кнопка "Сохранить" > `PUT /api/residences/me` (при первом сохранении: `POST /api/residences`)
-- Кнопка "Отправить повторно" (при rejected) > `POST /api/residences/me/resubmit-validation`
+- Опубликована ли программа (is_published)
+- Кнопка "Отправить" > `POST /api/residences/me`
+- Кнопка "Обновить" > `PUT /api/residences/me` (если заявка на валидацию в статусе rejected, при обновлении статус меняется на `pending`)
+
+- Статус валидации резиденции `GET /api/residences/me/validation-status` (доступ только у владельца резиденции)
+   - Бейдж `статус валидации` (pending, approved, rejected)
+   - Текст `комментарий суперадмина` (если есть)
 
 ### 14. АР: Статистика < `GET /api/residences/me/stats`
 - Блок "Резиденция":
