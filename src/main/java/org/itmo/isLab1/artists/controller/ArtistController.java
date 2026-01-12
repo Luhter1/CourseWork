@@ -13,6 +13,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -26,6 +30,19 @@ public class ArtistController {
 
     private final ArtistService artistService;
     private final UserRepository userRepository;
+
+    /**
+     * Получение профилей художников
+     *
+     * @return профили художников
+     */
+    @GetMapping
+    public ResponseEntity<Page<ArtistProfileDto>> getArtistsProfile(
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        var obj = artistService.getArtistsProfile(pageable);
+
+        return ResponseEntity.ok(obj);
+    }
 
     /**
      * Получение профиля художника

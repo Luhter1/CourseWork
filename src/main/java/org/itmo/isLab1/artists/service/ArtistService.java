@@ -12,6 +12,8 @@ import org.itmo.isLab1.common.errors.EntityDuplicateException;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
 import org.itmo.isLab1.users.User;
 import org.itmo.isLab1.users.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,6 +27,20 @@ public class ArtistService {
     private final UserRepository userRepository;
     private final ArtistProfileRepository artistDetailsRepository;
     private final ArtistMapper artistMapper;
+
+    /**
+     * Получение профилей художников
+     *
+     * @return профили художников
+     */
+    public Page<ArtistProfileDto> getArtistsProfile(Pageable pageable) {
+        Page<ArtistProfile> profiles = artistDetailsRepository.findAll(pageable);
+
+        return profiles.map(profile -> {
+            User user = profile.getUser();
+            return artistMapper.toProfileResponse(user, profile);
+        });
+    }
 
     /**
      * Получает профиль художника по id
