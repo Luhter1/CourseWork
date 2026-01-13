@@ -524,7 +524,7 @@ BEGIN
         location,
         contacts,
         is_published,
-        validation_status
+        validation_status,
         created_at,
         updated_at
     )

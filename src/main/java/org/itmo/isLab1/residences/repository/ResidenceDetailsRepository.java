@@ -23,4 +23,6 @@ public interface ResidenceDetailsRepository extends JpaRepository<ResidenceDetai
 
     Page<ResidenceDetails> findByValidationStatus(ValidationStatus status, Pageable pageable);
 
+    Page<ResidenceDetails> findByIsPublishedTrue(Pageable pageable);
+
 }

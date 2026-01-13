@@ -74,5 +74,5 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER trg_validation_request_approved
 AFTER UPDATE ON art2art_residence_details
 FOR EACH ROW
-WHEN (NEW.validation_status = 'approved' AND OLD.validation_status IS DISTINCT FROM 'approved')
+WHEN (NEW.validation_status = 'APPROVED' AND OLD.validation_status IS DISTINCT FROM 'APPROVED')
 EXECUTE FUNCTION update_residence_publish_status();

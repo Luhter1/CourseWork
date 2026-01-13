@@ -22,7 +22,7 @@ import org.mapstruct.ReportingPolicy;
 )
 public interface ArtistMapper {
     
-    @Mapping(source = "user.id", target = "id")
+    @Mapping(source = "user.id", target = "userId")
     @Mapping(source = "user.username", target = "email")
     @Mapping(source = "user.name", target = "name")
     @Mapping(source = "user.surname", target = "surname")

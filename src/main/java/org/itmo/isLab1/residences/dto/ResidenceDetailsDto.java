@@ -20,7 +20,7 @@ public class ResidenceDetailsDto {
     private String title;
     private String description;
     private String location;
-    private Map<String, String> contacts;
+    private Map<String, Object> contacts;
     private Boolean isPublished;
 
     private ValidationResponseDto validation;

@@ -137,8 +137,7 @@ public class ResidenceDetailsService {
      * @return страница с профилями резиденций
      */
     public Page<ResidenceDetailsDto> getAllPublished(Pageable pageable) {
-        return repository.findAll(pageable)
-                .filter(details -> details.getIsPublished() != null && details.getIsPublished())
+        return repository.findByIsPublishedTrue(pageable)
                 .map(mapper::toResidenceDetails);
     }
 

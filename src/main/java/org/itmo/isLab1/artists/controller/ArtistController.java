@@ -6,10 +6,10 @@ import org.itmo.isLab1.artists.dto.ArtistProfileDto;
 import org.itmo.isLab1.artists.dto.ArtistProfileUpdateDto;
 import org.itmo.isLab1.artists.dto.ArtistProfileCreateDto;
 import org.itmo.isLab1.artists.service.ArtistService;
-import org.itmo.isLab1.common.applications.dto.ArtistApplicationDto;
+// import org.itmo.isLab1.common.applications.dto.ArtistApplicationDto;
 import org.itmo.isLab1.common.notifications.dto.NotificationsDto;
 import org.itmo.isLab1.common.notifications.service.NotificationService;
-import org.itmo.isLab1.common.applications.service.ArtistApplicationService;
+// import org.itmo.isLab1.common.applications.service.ArtistApplicationService;
 import org.itmo.isLab1.users.User;
 import org.itmo.isLab1.users.UserRepository;
 import org.springframework.security.core.Authentication;
@@ -34,7 +34,7 @@ public class ArtistController {
 
     private final ArtistService artistService;
     private final NotificationService notificationService;
-    private final ArtistApplicationService artistApplicationService;
+    // private final ArtistApplicationService artistApplicationService;
     private final UserRepository userRepository;
 
     /**
@@ -115,14 +115,14 @@ public class ArtistController {
         return ResponseEntity.status(HttpStatus.CREATED).body(notificationId);
     }
 
-    @GetMapping("/me/applications")
-    @PreAuthorize("hasRole('ARTIST')")
-    public ResponseEntity<Page<ArtistApplicationDto>> getMyApplications(
-            @PageableDefault(size = 20, sort = "submittedAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    // @GetMapping("/me/applications")
+    // @PreAuthorize("hasRole('ARTIST')")
+    // public ResponseEntity<Page<ArtistApplicationDto>> getMyApplications(
+    //         @PageableDefault(size = 20, sort = "submittedAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        Page<ArtistApplicationDto> page = artistApplicationService.getMyApplications(pageable);
-        return ResponseEntity.ok(page);
-    }
+    //     Page<ArtistApplicationDto> page = artistApplicationService.getMyApplications(pageable);
+    //     return ResponseEntity.ok(page);
+    // }
 
     /**
      * Вспомогательный метод для получения текущего пользователя из контекста безопасности

@@ -23,12 +23,13 @@ import org.mapstruct.ReportingPolicy;
 )
 public interface ResidenceDetailsMapper {
     
-    @Mapping(source = "details.user.id", target = "userId")
     ValidationResponseDto toValidationResponse(ResidenceDetails details);
 
+    @Mapping(source = "details.user.id", target = "userId")
     @Mapping(target = "validation", expression = "java(null)")
     ResidenceDetailsDto toResidenceDetails(ResidenceDetails details);
 
+    @Mapping(source = "details.user.id", target = "userId")
     ResidenceDetailsDto toResidenceDetailsWithValidation(ResidenceDetails details);
     
     void updateResidenceDetails(ResidenceDetailsUpdateDto request, @MappingTarget ResidenceDetails details);
