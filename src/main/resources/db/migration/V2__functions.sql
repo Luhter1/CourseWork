@@ -488,7 +488,6 @@ DECLARE
     v_user_role art2art_user_role_enum;
     v_existing_residence BIGINT;
     v_residence_id BIGINT;
-    v_validation_id BIGINT;
 BEGIN
     -- 1. Проверить, что пользователь существует и имеет роль ROLE_RESIDENCE_ADMIN
     SELECT role INTO v_user_role
@@ -550,7 +549,7 @@ BEGIN
     -- Создать уведомление для администратора резиденции
     PERFORM create_notification(
         (SELECT email FROM art2art_users WHERE id = p_user_id),
-        format('Профиль резиденции "%s" создан. Заявка на валидацию #%s отправлена на рассмотрение', p_title, v_validation_id),
+        format('Профиль резиденции "%s" создан. Заявка на валидацию отправлена на рассмотрение', p_title, v_residence_id),
         'status',
         NULL
     );
