@@ -26,7 +26,10 @@ public interface ResidenceDetailsMapper {
     @Mapping(source = "details.user.id", target = "userId")
     ValidationResponseDto toValidationResponse(ResidenceDetails details);
 
+    @Mapping(target = "validation", expression = "java(null)")
     ResidenceDetailsDto toResidenceDetails(ResidenceDetails details);
+
+    ResidenceDetailsDto toResidenceDetailsWithValidation(ResidenceDetails details);
     
     void updateResidenceDetails(ResidenceDetailsUpdateDto request, @MappingTarget ResidenceDetails details);
 

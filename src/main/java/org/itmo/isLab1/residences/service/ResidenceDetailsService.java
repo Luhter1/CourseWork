@@ -62,7 +62,7 @@ public class ResidenceDetailsService {
         
         ResidenceDetails details = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Профиль резиденции не найден после создания"));
-        return mapper.toResidenceDetails(details);
+        return mapper.toResidenceDetailsWithValidation(details);
     }
     
     private String extractDatabaseErrorMessage(DataAccessException e) {
@@ -96,7 +96,7 @@ public class ResidenceDetailsService {
         }
 
         details = repository.save(details);
-        return mapper.toResidenceDetails(details);
+        return mapper.toResidenceDetailsWithValidation(details);
     }
 
     /**
@@ -110,7 +110,7 @@ public class ResidenceDetailsService {
                 .filter(rd -> rd.getUser().getId().equals(user.getId()))
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Профиль резиденции не найден"));
-        return mapper.toResidenceDetails(details);
+        return mapper.toResidenceDetailsWithValidation(details);
     }
 
     /**
