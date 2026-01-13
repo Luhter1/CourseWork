@@ -79,6 +79,12 @@ public class SecurityConfiguration {
                       .requestMatchers(HttpMethod.DELETE, "/api/artists/me/**").hasRole("ARTIST")
                       .requestMatchers(HttpMethod.GET, "/api/artists/me/**").hasRole("ARTIST");
 
+                // Публичный доступ к просмотру residences (проверка публикации в сервисе)
+                request.requestMatchers(HttpMethod.GET, "/api/residences/**").permitAll();
+
+                // Операции с /me только для RESIDENCE_ADMIN
+                request.requestMatchers("/api/residences/me/**").hasRole("RESIDENCE_ADMIN");
+
                 // Всё остальное - deny
                 request.anyRequest().denyAll();
             })

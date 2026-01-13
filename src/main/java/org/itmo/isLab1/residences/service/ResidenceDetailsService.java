@@ -1,0 +1,197 @@
+package org.itmo.isLab1.residences.service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.itmo.isLab1.residences.dto.ResidenceDetailsCreateDto;
+import org.itmo.isLab1.residences.dto.ResidenceDetailsDto;
+import org.itmo.isLab1.residences.dto.ResidenceDetailsUpdateDto;
+import org.itmo.isLab1.residences.dto.ValidationResponseDto;
+import org.itmo.isLab1.residences.entity.ResidenceDetails;
+import org.itmo.isLab1.residences.entity.ValidationStatus;
+import org.itmo.isLab1.residences.mapper.ResidenceDetailsMapper;
+import org.itmo.isLab1.residences.repository.ResidenceDetailsRepository;
+import org.itmo.isLab1.common.errors.ResourceNotFoundException;
+import org.itmo.isLab1.common.errors.PolicyViolationError;
+import org.springframework.dao.DataAccessException;
+import org.itmo.isLab1.users.User;
+import org.itmo.isLab1.users.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class ResidenceDetailsService {
+
+    private final ResidenceDetailsRepository repository;
+    private final ResidenceDetailsMapper mapper;
+    private final ObjectMapper objectMapper;
+    private final UserRepository userRepository;
+
+    @Transactional
+    public ResidenceDetailsDto create(Long userId, ResidenceDetailsCreateDto dto) {
+        String contactsJson;
+        try {
+            contactsJson = objectMapper.writeValueAsString(dto.getContacts());
+        } catch (JsonProcessingException e) {
+            log.error("Не удалось сериализовать контакты для пользователя {}: {}", userId, e.getMessage());
+            throw new IllegalArgumentException("Невозможно сериализовать контакты в JSON: " + e.getMessage(), e);
+        }
+        
+        Long id;
+        try {
+            id = repository.createResidenceProfile(
+                    dto.getTitle(),
+                    dto.getDescription(),
+                    dto.getLocation(),
+                    contactsJson,
+                    userId
+            );
+        } catch (DataAccessException e) {
+            String errorMessage = extractDatabaseErrorMessage(e);
+            log.error("Ошибка при создании профиля резиденции для пользователя {}: {}", userId, errorMessage);
+            throw new IllegalStateException("Не удалось создать профиль резиденции: " + errorMessage, e);
+        }
+        
+        ResidenceDetails details = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Профиль резиденции не найден после создания"));
+        return mapper.toResidenceDetails(details);
+    }
+    
+    private String extractDatabaseErrorMessage(DataAccessException e) {
+        Throwable cause = e.getRootCause();
+        if (cause != null && cause.getMessage() != null) {
+            String message = cause.getMessage();
+            // Извлекаем сообщение после "ERROR:" или берем все сообщение
+            if (message.contains("ERROR:")) {
+                int startIndex = message.indexOf("ERROR:") + 6;
+                int endIndex = message.indexOf("\n", startIndex);
+                if (endIndex > startIndex) {
+                    return message.substring(startIndex, endIndex).trim();
+                }
+            }
+            return message;
+        }
+        return e.getMessage() != null ? e.getMessage() : "Неизвестная ошибка базы данных";
+    }
+
+    @Transactional
+    public ResidenceDetailsDto update(Long id, ResidenceDetailsUpdateDto dto) {
+        ResidenceDetails details = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Профиль резиденции не найден"));
+
+        ValidationStatus oldStatus = details.getValidationStatus();
+
+        mapper.updateResidenceDetails(dto, details);
+
+        if (oldStatus == ValidationStatus.REJECTED) {
+            details.setValidationStatus(ValidationStatus.PENDING);
+        }
+
+        details = repository.save(details);
+        return mapper.toResidenceDetails(details);
+    }
+
+    /**
+     * Получение профиля резиденции текущего пользователя
+     *
+     * @return профиль резиденции
+     */
+    public ResidenceDetailsDto getMyProfile() {
+        User user = getCurrentUser();
+        ResidenceDetails details = repository.findAll().stream()
+                .filter(rd -> rd.getUser().getId().equals(user.getId()))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Профиль резиденции не найден"));
+        return mapper.toResidenceDetails(details);
+    }
+
+    /**
+     * Получение профиля резиденции по ID
+     *
+     * @param id ID профиля резиденции
+     * @return профиль резиденции
+     */
+    public ResidenceDetailsDto getProfile(Long id) {
+        ResidenceDetails details = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Профиль резиденции с id " + id + " не найден"));
+        
+        // Проверка доступа: владелец может видеть всегда, остальные - только если опубликована
+        User currentUser = getCurrentUserOrNull();
+        boolean isOwner = currentUser != null && details.getUser().getId().equals(currentUser.getId());
+        boolean isPublished = details.getIsPublished() != null && details.getIsPublished();
+        
+        if (!isOwner && !isPublished) {
+            throw new PolicyViolationError("Доступ к резиденции возможен только для владельца или если она опубликована");
+        }
+        
+        return mapper.toResidenceDetails(details);
+    }
+
+    /**
+     * Получение списка всех опубликованных резиденций с пагинацией
+     *
+     * @param pageable параметры пагинации
+     * @return страница с профилями резиденций
+     */
+    public Page<ResidenceDetailsDto> getAllPublished(Pageable pageable) {
+        return repository.findAll(pageable)
+                .filter(details -> details.getIsPublished() != null && details.getIsPublished())
+                .map(mapper::toResidenceDetails);
+    }
+
+    /**
+     * Вспомогательный метод для получения текущего пользователя из контекста безопасности
+     *
+     * @return пользователь
+     * @throws UsernameNotFoundException если пользователь не найден
+     */
+    private User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с username " + username + " не найден"));
+        return user;
+    }
+
+    /**
+     * Вспомогательный метод для безопасного получения текущего пользователя (nullable)
+     *
+     * @return пользователь или null если не аутентифицирован
+     */
+    private User getCurrentUserOrNull() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getPrincipal())) {
+            return null;
+        }
+        String username = authentication.getName();
+        return userRepository.findByUsername(username).orElse(null);
+    }
+
+    /**
+     * Получение статуса валидации профиля резиденции текущего пользователя
+     *
+     * @return статус валидации с комментарием и датой отправки
+     */
+    public ValidationResponseDto getMyValidationStatus() {
+        User user = getCurrentUser();
+        ResidenceDetails details = repository.findAll().stream()
+                .filter(rd -> rd.getUser().getId().equals(user.getId()))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Профиль резиденции не найден"));
+        
+        return ValidationResponseDto.builder()
+                .validationStatus(details.getValidationStatus())
+                .validationComment(details.getValidationComment())
+                .validationSubmittedAt(details.getValidationSubmittedAt())
+                .build();
+    }
+}
