@@ -143,7 +143,9 @@ public class ArtistAchievementService {
      * @throws PolicyViolationError      если попытка удалить достижение с типом AUTO
      */
     @Transactional
-    public void deleteAchievement(Long artistId, Long achievementId) {
+    public void deleteAchievement(Long achievementId) {
+        Long artistId = getCurrentArtistId();
+        
         // Находим достижение и проверяем принадлежность художнику
         Achievement achievement = achievementRepository.findByIdAndArtistId(achievementId, artistId)
                 .orElseThrow(() -> new ResourceNotFoundException(

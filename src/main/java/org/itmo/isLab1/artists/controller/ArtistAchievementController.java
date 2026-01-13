@@ -5,23 +5,14 @@ import lombok.RequiredArgsConstructor;
 import org.itmo.isLab1.artists.dto.AchievementCreateDto;
 import org.itmo.isLab1.artists.dto.AchievementDto;
 import org.itmo.isLab1.artists.dto.AchievementUpdateDto;
-import org.itmo.isLab1.artists.entity.ArtistProfile;
-import org.itmo.isLab1.artists.repository.ArtistProfileRepository;
 import org.itmo.isLab1.artists.service.ArtistAchievementService;
-import org.itmo.isLab1.common.errors.ResourceNotFoundException;
-import org.itmo.isLab1.users.User;
-import org.itmo.isLab1.users.UserRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,8 +31,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ArtistAchievementController {
 
     private final ArtistAchievementService artistAchievementService;
-    private final UserRepository userRepository;
-    private final ArtistProfileRepository artistDetailsRepository;
 
     /**
      * Получение списка достижений художника
@@ -51,9 +40,9 @@ public class ArtistAchievementController {
     @GetMapping("/{id}/achievements")
     public ResponseEntity<Page<AchievementDto>> getArtistAchievements(
         @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
-        @PathVariable Long id
+        @PathVariable Long userId
     ) {
-        var objs = artistAchievementService.getArtistAchievements(id, pageable);
+        var objs = artistAchievementService.getArtistAchievements(userId, pageable);
 
         return ResponseEntity.ok()
             .header("X-Total-Count", String.valueOf(objs.getTotalElements()))
@@ -101,9 +90,9 @@ public class ArtistAchievementController {
     @PutMapping("/me/achievements/{id}")
     @PreAuthorize("hasRole('ARTIST')")
     public ResponseEntity<AchievementDto> updateAchievement(
-            @PathVariable Long id,
+            @PathVariable Long achievementId,
             @Valid @RequestBody AchievementUpdateDto updateDto) {
-        var obj = artistAchievementService.updateAchievement(id, updateDto);
+        var obj = artistAchievementService.updateAchievement(achievementId, updateDto);
 
         return ResponseEntity.ok(obj);
     }
@@ -116,32 +105,9 @@ public class ArtistAchievementController {
     @DeleteMapping("/me/achievements/{id}")
     @PreAuthorize("hasRole('ARTIST')")
     public ResponseEntity<Void> deleteAchievement(
-            @PathVariable Long id) {
-        Long artistId = getCurrentArtistId();
-        artistAchievementService.deleteAchievement(artistId, id);
+            @PathVariable Long achievementId) {
+        artistAchievementService.deleteAchievement(achievementId);
 
         return ResponseEntity.noContent().build();
-    }
-
-    /**
-     * Вспомогательный метод для получения ID текущего художника из контекста безопасности
-     *
-     * @return ID художника
-     * @throws UsernameNotFoundException если пользователь не найден
-     * @throws AccessDeniedException     если пользователь не является художником
-     * @throws ResourceNotFoundException если профиль художника не найден
-     */
-    private Long getCurrentArtistId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // Извлекаем текущего пользователя из SecurityContextHolder.getContext().getAuthentication().getPrincipal()
-        String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с username " + username + " не найден"));
-
-        // Находим связанный ArtistDetails
-        ArtistProfile artistDetails = artistDetailsRepository.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("Профиль художника не найден"));
-
-        return artistDetails.getId();
     }
 }
