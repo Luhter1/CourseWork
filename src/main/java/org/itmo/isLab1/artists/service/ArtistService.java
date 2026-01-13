@@ -48,9 +48,9 @@ public class ArtistService {
      * @param id ID пользователя (художника)
      * @return профиль художника
      */
-    public ArtistProfileDto getArtistProfile(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с id " + id + " не найден"));
+    public ArtistProfileDto getArtistProfile(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с id " + userId + " не найден"));
 
         return getArtistProfile(user);
     }

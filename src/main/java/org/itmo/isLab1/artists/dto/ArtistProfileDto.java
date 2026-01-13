@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class ArtistProfileDto {
-    private final Integer id;
+    private final Long userId;
     private final String email;
     private final String name;
     private final String surname;

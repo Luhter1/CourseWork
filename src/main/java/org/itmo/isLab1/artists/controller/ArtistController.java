@@ -57,8 +57,8 @@ public class ArtistController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<ArtistProfileDto> getArtistProfile(
-            @PathVariable Long id) {
-        var obj = artistService.getArtistProfile(id);
+            @PathVariable Long userId) {
+        var obj = artistService.getArtistProfile(userId);
 
         return ResponseEntity.ok(obj);
     }
@@ -105,10 +105,9 @@ public class ArtistController {
         return ResponseEntity.ok(obj);
     }
 
-    @PostMapping("/{id}/invite")
+    @PostMapping("/invite")
     @PreAuthorize("hasRole('RESIDENCE_ADMIN')")
     public ResponseEntity<Long> inviteArtist(
-            @PathVariable Long id,
             @Valid @RequestBody NotificationsDto request) {
 
         Long notificationId = notificationService.sendInviteNotification(request);
