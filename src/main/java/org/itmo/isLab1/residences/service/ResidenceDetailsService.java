@@ -123,13 +123,8 @@ public class ResidenceDetailsService {
         ResidenceDetails details = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Профиль резиденции с id " + id + " не найден"));
         
-        // Проверка доступа: владелец может видеть всегда, остальные - только если опубликована
-        User currentUser = getCurrentUserOrNull();
-        boolean isOwner = currentUser != null && details.getUser().getId().equals(currentUser.getId());
-        boolean isPublished = details.getIsPublished() != null && details.getIsPublished();
-        
-        if (!isOwner && !isPublished) {
-            throw new PolicyViolationError("Доступ к резиденции возможен только для владельца или если она опубликована");
+        if (!details.getIsPublished()) {
+            throw new PolicyViolationError("Доступ к резиденции возможен только если она опубликована");
         }
         
         return mapper.toResidenceDetails(details);
@@ -159,21 +154,6 @@ public class ResidenceDetailsService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь с username " + username + " не найден"));
         return user;
-    }
-
-    /**
-     * Вспомогательный метод для безопасного получения текущего пользователя (nullable)
-     *
-     * @return пользователь или null если не аутентифицирован
-     */
-    private User getCurrentUserOrNull() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()
-                || "anonymousUser".equals(authentication.getPrincipal())) {
-            return null;
-        }
-        String username = authentication.getName();
-        return userRepository.findByUsername(username).orElse(null);
     }
 
     /**
