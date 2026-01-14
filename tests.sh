@@ -187,6 +187,21 @@ curl -X POST http://localhost:15123/api/residences/me \
 curl -X GET http://localhost:15123/api/residences/me \
   -H "Authorization: Bearer $ACCESS_TOKEN"
 
+# обновление своего профиля резиденции
+curl -X PUT http://localhost:15123/api/residences/me \
+-H "Authorization: Bearer $ACCESS_TOKEN" \
+-H "Content-Type: application/json" \
+-d '{
+  "title": "Резиденция Альфа (обновлённая 2)",
+  "description": null,
+  "location": "Москва, Инновационный парк",
+  "contacts": {
+    "email": "contact@alpha-residence.ru",
+    "telegram": "@alpha_residence"
+  }
+}'
+
+
 # получение статуса валидации своего профиля резиденции
 curl -X GET http://localhost:15123/api/residences/me/validation-status   -H "Authorization: Bearer $ACCESS_TOKEN"
 
@@ -195,3 +210,23 @@ curl -X GET http://localhost:15123/api/residences/1
 
 # список опубликованных профилей резиденции
 curl -X GET http://localhost:15123/api/residences
+
+
+# список всех валидаций профилей резиденции (только для SUPERADMIN)
+curl -X GET "http://localhost:15123/api/admin/validation-requests" \
+  -H "Authorization: Bearer $ROLE_SUPERADMIN"
+
+# получение конкретной валидации профиля резиденции по ID (только для SUPERADMIN)
+curl -X GET "http://localhost:15123/api/admin/validation-requests/1" \
+  -H "Authorization: Bearer $ROLE_SUPERADMIN"
+
+curl -X POST "http://localhost:15123/api/admin/validation-requests/1/approve" \
+  -H "Authorization: Bearer $ROLE_SUPERADMIN"
+
+curl -X POST "http://localhost:15123/api/admin/validation-requests/1/reject" \
+  -H "Authorization: Bearer $ROLE_SUPERADMIN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "comment": "Недостаточно информации для подтверждения"
+  }'
+

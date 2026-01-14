@@ -65,7 +65,7 @@ BEGIN
     SET is_published = TRUE,
         validation_submitted_at = now(),
         updated_at = now()
-    WHERE id = NEW.residence_id;
+    WHERE id = NEW.id;
     
     RETURN NEW;
 END;

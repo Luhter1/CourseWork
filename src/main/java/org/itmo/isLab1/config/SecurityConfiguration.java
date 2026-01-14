@@ -85,6 +85,8 @@ public class SecurityConfiguration {
                 // Операции с /me только для RESIDENCE_ADMIN
                 request.requestMatchers("/api/residences/me/**").hasRole("RESIDENCE_ADMIN");
 
+                request.requestMatchers("/api/admin/validation-requests/**").hasRole("SUPERADMIN");
+
                 // Всё остальное - deny
                 request.anyRequest().denyAll();
             })

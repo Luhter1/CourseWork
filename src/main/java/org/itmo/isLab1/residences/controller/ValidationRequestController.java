@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/admin/validation-requests")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('SUPER_ADMIN')")
+@PreAuthorize("hasRole('SUPERADMIN')")
 public class ValidationRequestController {
 
     private final ResidenceDetailsService residenceDetailsService;
