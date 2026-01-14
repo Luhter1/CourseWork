@@ -11,6 +11,7 @@ import org.itmo.isLab1.residences.entity.ValidationStatus;
 import org.itmo.isLab1.residences.mapper.ResidenceDetailsMapper;
 import org.itmo.isLab1.residences.repository.ResidenceDetailsRepository;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
+import org.itmo.isLab1.common.notifications.service.NotificationService;
 import org.itmo.isLab1.common.errors.PolicyViolationError;
 import org.springframework.dao.DataAccessException;
 import org.itmo.isLab1.users.User;
@@ -34,6 +35,7 @@ public class ResidenceDetailsService {
     private final ResidenceDetailsMapper mapper;
     private final ObjectMapper objectMapper;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public ResidenceDetailsDto create(Long userId, ResidenceDetailsCreateDto dto) {
@@ -212,6 +214,14 @@ public class ResidenceDetailsService {
         details.setValidationComment(null);
         
         details = repository.save(details);
+
+        notificationService.sendNotification(
+                details.getUser().getUsername(),
+                String.format("Ваша заявка на валидацию резиденции \"%s\" была одобрена.",
+                    details.getTitle()),
+                "status",
+                null
+            );
         return mapper.toResidenceDetailsWithValidation(details);
     }
 
@@ -232,6 +242,14 @@ public class ResidenceDetailsService {
         details.setValidationComment(comment);
         
         details = repository.save(details);
+
+        notificationService.sendNotification(
+                details.getUser().getUsername(),
+                String.format("Ваша заявка на валидацию резиденции \"%s\" была отклонена.",
+                    details.getTitle()),
+                "status",
+                null
+            );
         return mapper.toResidenceDetailsWithValidation(details);
     }
 }

@@ -28,11 +28,30 @@ public class NotificationService {
 
         // Вызываем SQL-функцию
         Long notificationId = (Long) entityManager.createNativeQuery(
-                "SELECT create_notification_by_email(:email, :message, :category, :link)")
+                "SELECT create_notification(:email, :message, :category, :link)")
                 .setParameter("email", dto.getEmail())
                 .setParameter("message", dto.getMessage())
                 .setParameter("category", dto.getCategory())
                 .setParameter("link", dto.getLink())
+                .getSingleResult();
+
+        return notificationId;
+    }
+
+    @Transactional
+    public Long sendNotification(
+        String email, String message, String category, String link) {
+        // Проверяем, что пользователь существует
+        userRepository.findByUsername(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Пользователь с email " + email + " не найден"));
+
+        // Вызываем SQL-функцию
+        Long notificationId = (Long) entityManager.createNativeQuery(
+                "SELECT create_notification(:email, :message, :category, :link)")
+                .setParameter("email", email)
+                .setParameter("message", message)
+                .setParameter("category", category)
+                .setParameter("link", link)
                 .getSingleResult();
 
         return notificationId;
