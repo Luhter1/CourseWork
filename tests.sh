@@ -167,3 +167,31 @@ curl -X POST "http://localhost:15123/api/artists/me/works/1/media" \
   -H "Authorization: Bearer $ARTIST_TOKEN" \
   -H "Content-Type: multipart/form-data" \
   -F "files=@component_diagram.drawio.png"
+
+# профили резиденции
+curl -X POST http://localhost:15123/api/residences/me \
+  -H "Authorization: Bearer $ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Резиденция Альфа",
+    "description": "Современная резиденция для стартапов",
+    "location": "Москва, ул. Примерная, 1",
+    "contacts": {
+      "email": "info@alpha-residence.ru",
+      "phone": "+7-999-123-45-67",
+      "website": "https://alpha-residence.ru"
+    }
+  }'
+
+# получение своего профиля резиденции
+curl -X GET http://localhost:15123/api/residences/me \
+  -H "Authorization: Bearer $ACCESS_TOKEN"
+
+# получение статуса валидации своего профиля резиденции
+curl -X GET http://localhost:15123/api/residences/me/validation-status   -H "Authorization: Bearer $ACCESS_TOKEN"
+
+# профиль резиденции по ID
+curl -X GET http://localhost:15123/api/residences/1
+
+# список опубликованных профилей резиденции
+curl -X GET http://localhost:15123/api/residences

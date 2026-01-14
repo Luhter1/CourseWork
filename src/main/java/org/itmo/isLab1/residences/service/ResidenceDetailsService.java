@@ -56,7 +56,7 @@ public class ResidenceDetailsService {
             );
         } catch (DataAccessException e) {
             String errorMessage = extractDatabaseErrorMessage(e);
-            log.error("Ошибка при создании профиля резиденции для пользователя {}: {}", userId, errorMessage);
+            log.error("Ошибка при создании профиля резиденции для пользователя {}: {}", userId, e.getRootCause());
             throw new IllegalStateException("Не удалось создать профиль резиденции: " + errorMessage, e);
         }
         
@@ -106,9 +106,7 @@ public class ResidenceDetailsService {
      */
     public ResidenceDetailsDto getMyProfile() {
         User user = getCurrentUser();
-        ResidenceDetails details = repository.findAll().stream()
-                .filter(rd -> rd.getUser().getId().equals(user.getId()))
-                .findFirst()
+        ResidenceDetails details = repository.findByUserId(user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Профиль резиденции не найден"));
         return mapper.toResidenceDetailsWithValidation(details);
     }
@@ -162,9 +160,7 @@ public class ResidenceDetailsService {
      */
     public ValidationResponseDto getMyValidationStatus() {
         User user = getCurrentUser();
-        ResidenceDetails details = repository.findAll().stream()
-                .filter(rd -> rd.getUser().getId().equals(user.getId()))
-                .findFirst()
+        ResidenceDetails details = repository.findByUserId(user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Профиль резиденции не найден"));
         
         return ValidationResponseDto.builder()

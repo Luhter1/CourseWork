@@ -26,12 +26,13 @@ public interface ResidenceDetailsMapper {
     ValidationResponseDto toValidationResponse(ResidenceDetails details);
 
     @Mapping(source = "details.user.id", target = "userId")
+    @Mapping(target = "validation", expression = "java(toValidationResponse(details))")
+    ResidenceDetailsDto toResidenceDetailsWithValidation(ResidenceDetails details);
+
+    @Mapping(source = "details.user.id", target = "userId")
     @Mapping(target = "validation", expression = "java(null)")
     ResidenceDetailsDto toResidenceDetails(ResidenceDetails details);
 
-    @Mapping(source = "details.user.id", target = "userId")
-    ResidenceDetailsDto toResidenceDetailsWithValidation(ResidenceDetails details);
-    
     void updateResidenceDetails(ResidenceDetailsUpdateDto request, @MappingTarget ResidenceDetails details);
 
     @Mapping(target = "id", ignore = true)
