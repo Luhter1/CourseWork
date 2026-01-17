@@ -78,6 +78,43 @@ public class ResidenceProgramService {
         return residenceProgramMapper.toDto(program);
     }
 
+
+    @Transactional
+    public ResidenceProgramDto publishProgram(Long programId) {
+
+        User currentUser = getCurrentUser();
+        ResidenceDetails residence = residenceDetailsRepository.findByUserId(currentUser.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("У вас нет резиденции"));
+
+
+        ResidenceProgram program = residenceProgramRepository.findByResidenceIdAndId(residence.getId(), programId)
+                .orElseThrow(() -> new ResourceNotFoundException("У вам нет программы с id " + programId));
+
+        program.setIsPublished(true);
+
+        residenceProgramRepository.save(program);
+
+        return residenceProgramMapper.toDto(program);
+    }
+
+    @Transactional
+    public ResidenceProgramDto unpublishProgram(Long programId) {
+
+        User currentUser = getCurrentUser();
+        ResidenceDetails residence = residenceDetailsRepository.findByUserId(currentUser.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("У вас нет резиденции"));
+
+
+        ResidenceProgram program = residenceProgramRepository.findByResidenceIdAndId(residence.getId(), programId)
+                .orElseThrow(() -> new ResourceNotFoundException("У вам нет программы с id " + programId));
+
+        program.setIsPublished(false);
+
+        residenceProgramRepository.save(program);
+
+        return residenceProgramMapper.toDto(program);
+    }
+    
     /**
      * Обновляет программу
      *

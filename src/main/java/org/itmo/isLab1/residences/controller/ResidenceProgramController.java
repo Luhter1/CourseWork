@@ -78,6 +78,34 @@ public class ResidenceProgramController {
                 @PathVariable Long id,
                 @Valid @RequestBody ResidenceProgramUpdateDto updateDto) {
         ResidenceProgramDto dto = residenceProgramService.updateProgram(id, updateDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(dto);
+    }
+
+    /**
+     * Публикует программу для резиденции текущего пользователя
+     *
+     * @param createDto данные для создания программы
+     * @return созданная программа
+     */
+    @PutMapping("/{id}/publish")
+    @PreAuthorize("hasRole('RESIDENCE_ADMIN')")
+    public ResponseEntity<Void> publishProgram(
+                @PathVariable Long id) {
+        residenceProgramService.publishProgram(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    /**
+     * Разпубликует программу для резиденции текущего пользователя
+     *
+     * @param createDto данные для создания программы
+     * @return созданная программа
+     */
+    @PutMapping("/{id}/unpublish")
+    @PreAuthorize("hasRole('RESIDENCE_ADMIN')")
+    public ResponseEntity<Void> unpublishProgram(
+                @PathVariable Long id) {
+        residenceProgramService.unpublishProgram(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
