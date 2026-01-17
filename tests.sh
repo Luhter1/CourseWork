@@ -234,6 +234,33 @@ curl -X POST "http://localhost:15123/api/admin/validation-requests/1/reject" \
     "comment": "Недостаточно информации для подтверждения"
   }'
 
+# программы резиденции
+curl -X GET "http://localhost:15123/api/residences/me/programs?page=0&size=10&sort=createdAt,asc" \
+  -H "Authorization: Bearer $ROLE_RESIDENCE_ADMIN"
+
+curl -X POST "http://localhost:15123/api/residences/me/programs" \
+  -H "Authorization: Bearer $ROLE_RESIDENCE_ADMIN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Новая программа",
+    "description": "Описание новой программы",
+    "goals": {
+      "innovation": true,
+      "export": false
+    },
+    "conditions": {
+      "stage": "seed",
+      "country": "RU"
+    },
+    "deadlineApply": "2025-03-01",
+    "deadlineReview": "2025-03-10",
+    "deadlineNotify": "2025-03-15",
+    "durationDays": 60,
+    "budgetQuota": 500000,
+    "peopleQuota": 15
+  }'
+
+
 # cообщения
 curl -X GET "http://localhost:15123/api/notifications" \
   -H "Authorization: Bearer $TOKEN"

@@ -25,9 +25,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ResidenceDetailsService {
@@ -44,7 +42,6 @@ public class ResidenceDetailsService {
         try {
             contactsJson = objectMapper.writeValueAsString(dto.getContacts());
         } catch (JsonProcessingException e) {
-            log.error("Не удалось сериализовать контакты для пользователя {}: {}", userId, e.getMessage());
             throw new IllegalArgumentException("Невозможно сериализовать контакты в JSON: " + e.getMessage(), e);
         }
         
@@ -59,7 +56,6 @@ public class ResidenceDetailsService {
             );
         } catch (DataAccessException e) {
             String errorMessage = extractDatabaseErrorMessage(e);
-            log.error("Ошибка при создании профиля резиденции для пользователя {}: {}", userId, e.getRootCause());
             throw new IllegalStateException("Не удалось создать профиль резиденции: " + errorMessage, e);
         }
         
