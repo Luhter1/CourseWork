@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
-public class NotificationsDto {
+public class NotificationCreateDto {
     @NotBlank
     private String email;
 

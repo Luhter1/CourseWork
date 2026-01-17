@@ -7,7 +7,7 @@ import org.itmo.isLab1.artists.dto.ArtistProfileUpdateDto;
 import org.itmo.isLab1.artists.dto.ArtistProfileCreateDto;
 import org.itmo.isLab1.artists.service.ArtistService;
 // import org.itmo.isLab1.common.applications.dto.ArtistApplicationDto;
-import org.itmo.isLab1.common.notifications.dto.NotificationsDto;
+import org.itmo.isLab1.common.notifications.dto.NotificationCreateDto;
 import org.itmo.isLab1.common.notifications.service.NotificationService;
 // import org.itmo.isLab1.common.applications.service.ArtistApplicationService;
 import org.itmo.isLab1.users.User;
@@ -108,7 +108,7 @@ public class ArtistController {
     @PostMapping("/invite")
     @PreAuthorize("hasRole('RESIDENCE_ADMIN')")
     public ResponseEntity<Long> inviteArtist(
-            @Valid @RequestBody NotificationsDto request) {
+            @Valid @RequestBody NotificationCreateDto request) {
 
         Long notificationId = notificationService.sendInviteNotification(request);
 

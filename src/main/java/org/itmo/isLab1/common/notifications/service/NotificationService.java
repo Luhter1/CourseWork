@@ -3,7 +3,7 @@ package org.itmo.isLab1.common.notifications.service;
 import lombok.RequiredArgsConstructor;
 
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
-import org.itmo.isLab1.common.notifications.dto.NotificationsDto;
+import org.itmo.isLab1.common.notifications.dto.NotificationCreateDto;
 import org.itmo.isLab1.users.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +21,7 @@ public class NotificationService {
     private EntityManager entityManager;
 
     @Transactional
-    public Long sendInviteNotification(NotificationsDto dto) {
+    public Long sendInviteNotification(NotificationCreateDto dto) {
         // Проверяем, что пользователь существует
         userRepository.findByUsername(dto.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("Пользователь с email " + dto.getEmail() + " не найден"));
