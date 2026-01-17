@@ -45,6 +45,13 @@ CREATE TYPE art2art_validation_requests_status AS ENUM (
     'REJECTED'
 );
 
+CREATE TYPE art2art_notification_category AS ENUM (
+    'SYSTEM', 
+    'INVITE', 
+    'REVIEW', 
+    'STATUS'
+)
+
 -- таблица пользователей
 CREATE TABLE art2art_users (
     id              BIGSERIAL PRIMARY KEY,
