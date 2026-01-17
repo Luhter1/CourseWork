@@ -211,6 +211,10 @@ curl -X GET http://localhost:15123/api/residences/1
 # список опубликованных профилей резиденции
 curl -X GET http://localhost:15123/api/residences
 
+# статистика просмотров резиденции
+curl -X GET "http://localhost:15123/api/residences/me/stats" \
+  -H "Authorization: Bearer $ROLE_RESIDENCE_ADMIN"
+
 
 # список всех валидаций профилей резиденции (только для SUPERADMIN)
 curl -X GET "http://localhost:15123/api/admin/validation-requests" \
@@ -235,6 +239,9 @@ curl -X GET "http://localhost:15123/api/notifications" \
   -H "Authorization: Bearer $TOKEN"
 
 curl -X GET "http://localhost:15123/api/notifications/unread-count" \
+  -H "Authorization: Bearer $TOKEN"
+
+curl -X GET "http://localhost:15123/api/notifications/1/read" \
   -H "Authorization: Bearer $TOKEN"
 
 curl -X GET "http://localhost:15123/api/notifications/read-all" \

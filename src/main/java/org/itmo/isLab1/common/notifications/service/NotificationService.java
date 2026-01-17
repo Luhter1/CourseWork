@@ -6,6 +6,7 @@ import org.itmo.isLab1.common.notifications.dto.NotificationCreateDto;
 import org.itmo.isLab1.common.notifications.dto.NotificationDto;
 import org.itmo.isLab1.common.notifications.entity.Notification;
 import org.itmo.isLab1.common.notifications.mapper.NotificationMapper;
+import org.itmo.isLab1.common.notifications.entity.NotificationCategory;
 import org.itmo.isLab1.common.notifications.repository.NotificationRepository;
 import org.itmo.isLab1.users.UserRepository;
 import org.springframework.data.domain.Page;
@@ -33,33 +34,29 @@ public class NotificationService {
         userRepository.findByUsername(dto.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("Пользователь с email " + dto.getEmail() + " не найден"));
 
-        // Вызываем SQL-функцию
-        Long notificationId = (Long) entityManager.createNativeQuery(
-                "SELECT create_notification(:email, :message, :category, :link)")
-                .setParameter("email", dto.getEmail())
-                .setParameter("message", dto.getMessage())
-                .setParameter("category", dto.getCategory())
-                .setParameter("link", dto.getLink())
-                .getSingleResult();
+        Long notificationId = notificationRepository.createNotification(
+                dto.getEmail(),
+                dto.getMessage(),
+                dto.getCategory().name(),
+                dto.getLink()
+            );
 
         return notificationId;
     }
 
     @Transactional
     public Long sendNotification(
-        String email, String message, String category, String link) {
+        String email, String message, NotificationCategory category, String link) {
         // Проверяем, что пользователь существует
         userRepository.findByUsername(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Пользователь с email " + email + " не найден"));
 
-        // Вызываем SQL-функцию
-        Long notificationId = (Long) entityManager.createNativeQuery(
-                "SELECT create_notification(:email, :message, :category, :link)")
-                .setParameter("email", email)
-                .setParameter("message", message)
-                .setParameter("category", category)
-                .setParameter("link", link)
-                .getSingleResult();
+        Long notificationId = notificationRepository.createNotification(
+                    email,
+                    message,
+                    category.name(),
+                    link
+                );
 
         return notificationId;
     }

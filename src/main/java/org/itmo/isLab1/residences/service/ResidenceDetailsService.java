@@ -12,6 +12,7 @@ import org.itmo.isLab1.residences.mapper.ResidenceDetailsMapper;
 import org.itmo.isLab1.residences.repository.ResidenceDetailsRepository;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
 import org.itmo.isLab1.common.notifications.service.NotificationService;
+import org.itmo.isLab1.common.notifications.entity.NotificationCategory;
 import org.itmo.isLab1.common.errors.PolicyViolationError;
 import org.springframework.dao.DataAccessException;
 import org.itmo.isLab1.users.User;
@@ -119,14 +120,14 @@ public class ResidenceDetailsService {
      * @param id ID профиля резиденции
      * @return профиль резиденции
      */
-    public ResidenceDetailsDto getProfile(Long id) {
-        ResidenceDetails details = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Профиль резиденции с id " + id + " не найден"));
+    public ResidenceDetailsDto getProfile(Long residenceId) {
+        ResidenceDetails details = repository.findById(residenceId)
+                .orElseThrow(() -> new ResourceNotFoundException("Профиль резиденции с id " + residenceId + " не найден"));
         
         if (!details.getIsPublished()) {
             throw new PolicyViolationError("Доступ к резиденции возможен только если она опубликована");
         }
-        
+        repository.createResidenceViewLog(residenceId);
         return mapper.toResidenceDetails(details);
     }
 
@@ -219,7 +220,7 @@ public class ResidenceDetailsService {
                 details.getUser().getUsername(),
                 String.format("Ваша заявка на валидацию резиденции \"%s\" была одобрена.",
                     details.getTitle()),
-                "status",
+                NotificationCategory.STATUS,
                 null
             );
         return mapper.toResidenceDetailsWithValidation(details);
@@ -247,7 +248,7 @@ public class ResidenceDetailsService {
                 details.getUser().getUsername(),
                 String.format("Ваша заявка на валидацию резиденции \"%s\" была отклонена.",
                     details.getTitle()),
-                "status",
+                NotificationCategory.STATUS,
                 null
             );
         return mapper.toResidenceDetailsWithValidation(details);

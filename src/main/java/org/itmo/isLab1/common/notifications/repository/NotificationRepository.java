@@ -27,4 +27,22 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     @Modifying
     @Query("UPDATE Notification n SET n.readAt = CURRENT_TIMESTAMP WHERE n.user.id = :userId AND n.readAt IS NULL")
     int markAllAsRead(@Param("userId") Long userId);
+
+    @Query(
+        value = """
+            select create_notification(
+                :email, 
+                :message, 
+                CAST(:category AS art2art_notification_category), 
+                :link
+            )
+            """,
+        nativeQuery = true
+    )
+    Long createNotification(
+        @Param("email") String email,
+        @Param("message") String message,
+        @Param("category") String category,
+        @Param("link") String link
+    );
 }

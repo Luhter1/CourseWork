@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.ZonedDateTime;
 
+import org.itmo.isLab1.common.notifications.entity.NotificationCategory;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -15,7 +17,7 @@ public class NotificationDto {
     private Long id;
     private String message;
     private String link;
-    private String category;
+    private NotificationCategory category;
     private ZonedDateTime readAt;
     private ZonedDateTime createdAt;
 }

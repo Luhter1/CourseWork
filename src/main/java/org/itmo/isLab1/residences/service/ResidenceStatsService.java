@@ -8,9 +8,12 @@ import org.itmo.isLab1.residences.entity.ResidenceDetails;
 import org.itmo.isLab1.residences.entity.ResidenceStats;
 import org.itmo.isLab1.residences.repository.ResidenceDetailsRepository;
 import org.itmo.isLab1.residences.repository.ResidenceStatsRepository;
+import org.itmo.isLab1.residences.mapper.ResidenceStatsMapper;
 import org.itmo.isLab1.users.User;
+import org.itmo.isLab1.users.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +24,7 @@ public class ResidenceStatsService {
 
     private final ResidenceStatsRepository residenceStatsRepository;
     private final ResidenceDetailsRepository residenceDetailsRepository;
+    private final UserRepository userRepository;
     private final ResidenceStatsMapper residenceStatsMapper;
 
     /**
@@ -39,7 +43,7 @@ public class ResidenceStatsService {
         ResidenceStats stats = residenceStatsRepository.findByResidenceId(residence.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Статистика для резиденции с id " + residence.getId() + " не найдена"));
         
-        return residenceStatsMapper.map(stats);
+        return residenceStatsMapper.toDto(stats);
     }
 
     /**

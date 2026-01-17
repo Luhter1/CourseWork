@@ -58,7 +58,7 @@ $$;
 ----------------------------------------------------------------------
 -- вставка в art2art_program_views_log (триггер увеличит счетчик)
 ----------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION log_program_view(p_program_id BIGINT, p_user_id BIGINT DEFAULT NULL) RETURNS VOID
+CREATE OR REPLACE FUNCTION log_program_view(p_program_id BIGINT) RETURNS VOID
 LANGUAGE plpgsql
 AS $$
 BEGIN
@@ -69,7 +69,7 @@ $$;
 ----------------------------------------------------------------------
 -- вставка в art2art_residence_views_log (триггер увеличит счетчик)
 ----------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION log_residence_view(p_residence_id BIGINT, p_user_id BIGINT DEFAULT NULL) RETURNS VOID
+CREATE OR REPLACE FUNCTION log_residence_view(p_residence_id BIGINT) RETURNS VOID
 LANGUAGE plpgsql
 AS $$
 BEGIN

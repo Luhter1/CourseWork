@@ -34,6 +34,18 @@ public interface ResidenceDetailsRepository extends JpaRepository<ResidenceDetai
         @Param("userId") Long userId
     );
 
+    @Query(
+        value = """
+            select log_residence_view(
+                :residenceId
+            )
+            """,
+        nativeQuery = true
+    )
+    void createResidenceViewLog(
+        @Param("residenceId") Long residenceId
+    );
+
     Page<ResidenceDetails> findByValidationStatus(ValidationStatus status, Pageable pageable);
 
     Page<ResidenceDetails> findByIsPublishedTrue(Pageable pageable);
