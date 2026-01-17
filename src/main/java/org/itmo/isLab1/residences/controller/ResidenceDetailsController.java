@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.itmo.isLab1.residences.dto.ResidenceDetailsCreateDto;
 import org.itmo.isLab1.residences.dto.ResidenceDetailsDto;
 import org.itmo.isLab1.residences.dto.ResidenceDetailsUpdateDto;
+import org.itmo.isLab1.residences.dto.ResidenceStatsDto;
 import org.itmo.isLab1.residences.dto.ValidationResponseDto;
 import org.itmo.isLab1.residences.service.ResidenceDetailsService;
+import org.itmo.isLab1.residences.service.ResidenceStatsService;
 import org.itmo.isLab1.users.User;
 import org.itmo.isLab1.users.UserRepository;
 import org.springframework.data.domain.Page;
@@ -31,7 +33,20 @@ public class ResidenceDetailsController {
 
     private final ResidenceDetailsService residenceDetailsService;
     private final UserRepository userRepository;
+    private final ResidenceStatsService residenceStatsService;
 
+    /**
+     * Получение статистики резиденции для текущего пользователя
+     *
+     * @return DTO со статистикой резиденции
+     */
+    @GetMapping("/me/stats")
+    @PreAuthorize("hasRole('RESIDENCE_ADMIN')")
+    public ResponseEntity<ResidenceStatsDto> getStatsForCurrentUser() {
+        ResidenceStatsDto dto = residenceStatsService.getStatsForCurrentUser();
+        return ResponseEntity.ok(dto);
+    }
+    
     /**
      * Создание профиля резиденции для текущего пользователя
      *
