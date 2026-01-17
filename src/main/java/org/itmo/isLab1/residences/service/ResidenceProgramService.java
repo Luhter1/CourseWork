@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.itmo.isLab1.common.errors.PolicyViolationError;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
 import org.itmo.isLab1.common.programs.dto.ResidenceProgramCreateDto;
+import org.itmo.isLab1.common.programs.dto.ResidenceProgramUpdateDto;
 import org.itmo.isLab1.common.programs.dto.ResidenceProgramDto;
 import org.itmo.isLab1.common.programs.entity.ResidenceProgram;
 import org.itmo.isLab1.common.programs.mapper.ResidenceProgramMapper;
@@ -73,6 +74,33 @@ public class ResidenceProgramService {
         // Проверяем принадлежность программы к резиденции
         ResidenceProgram program = residenceProgramRepository.findByResidenceIdAndId(residence.getId(), programId)
                 .orElseThrow(() -> new ResourceNotFoundException("Программа с id " + programId + " не найдена для резиденции"));
+
+        return residenceProgramMapper.toDto(program);
+    }
+
+    /**
+     * Обновляет программу
+     *
+     * @param updateDto
+     * @return DTO созданной программы
+     * @throws ResourceNotFoundException если резиденция не найдена
+     * @throws PolicyViolationError       если пользователь не является владельцем резиденции
+     * @throws IllegalArgumentException    при ошибках валидации данных
+     */
+    @Transactional
+    public ResidenceProgramDto updateProgram(Long programId, ResidenceProgramUpdateDto updateDto) {
+
+        User currentUser = getCurrentUser();
+        ResidenceDetails residence = residenceDetailsRepository.findByUserId(currentUser.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("У вас нет резиденции"));
+
+
+        ResidenceProgram program = residenceProgramRepository.findByResidenceIdAndId(residence.getId(), programId)
+                .orElseThrow(() -> new ResourceNotFoundException("У вам нет программы с id " + programId));
+
+        residenceProgramMapper.updateEntity(updateDto, program);
+
+        residenceProgramRepository.save(program);
 
         return residenceProgramMapper.toDto(program);
     }

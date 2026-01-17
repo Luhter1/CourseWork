@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.itmo.isLab1.common.programs.dto.ResidenceProgramCreateDto;
+import org.itmo.isLab1.common.programs.dto.ResidenceProgramUpdateDto;
 import org.itmo.isLab1.common.programs.dto.ResidenceProgramDto;
 import org.itmo.isLab1.residences.service.ResidenceProgramService;
 import org.springframework.data.domain.Page;
@@ -62,6 +63,21 @@ public class ResidenceProgramController {
     @PreAuthorize("hasRole('RESIDENCE_ADMIN')")
     public ResponseEntity<ResidenceProgramDto> createProgram(@Valid @RequestBody ResidenceProgramCreateDto createDto) {
         ResidenceProgramDto dto = residenceProgramService.createProgram(createDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+    }
+
+    /**
+     * Создаёт новую программу для резиденции текущего пользователя
+     *
+     * @param createDto данные для создания программы
+     * @return созданная программа
+     */
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('RESIDENCE_ADMIN')")
+    public ResponseEntity<ResidenceProgramDto> updateProgram(
+                @PathVariable Long id,
+                @Valid @RequestBody ResidenceProgramUpdateDto updateDto) {
+        ResidenceProgramDto dto = residenceProgramService.updateProgram(id, updateDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 }

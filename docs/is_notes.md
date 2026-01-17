@@ -222,12 +222,11 @@
 
 
 ### 16. АР: Управление программой
-- Кнопка "Опубликовать" / "Снять с публикации" > `POST /api/programs/{id}/publish` / `POST /api/programs/{id}/unpublish`
+- Кнопка "Опубликовать" / "Снять с публикации" > `POST /api/residences/me/programs/{id}/publish` / `POST /api/residences/me/programs/{id}/unpublish`
+- Кнопка "Обновить" > `PUT /api/residences/me/programs/{id}`
+
+
 - Вкладка "Информация" < `GET /api/programs/{id}`:
-   - Сайдбар "История изменений" < `GET /api/programs/{id}/history`:
-      - Список версий:
-         - Текст `дата версии`
-         - Развёртывающийся список изменённых полей (клик подставляет значение в поле)
    - Поле ввода `название`
    - Текстовое поле `цели резиденции`
    - Текстовое поле `описание`
