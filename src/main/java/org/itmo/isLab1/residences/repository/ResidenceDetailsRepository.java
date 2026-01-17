@@ -25,4 +25,6 @@ public interface ResidenceDetailsRepository extends JpaRepository<ResidenceDetai
 
     Page<ResidenceDetails> findByIsPublishedTrue(Pageable pageable);
 
+    Optional<ResidenceDetails> findByUserId(Long userId);
+
 }
