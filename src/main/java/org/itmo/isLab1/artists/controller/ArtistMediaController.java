@@ -37,7 +37,7 @@ public class ArtistMediaController {
      * @param pageable параметры пагинации
      * @return страница медиафайлов с заголовком X-Total-Count
      */
-    @GetMapping("/{id}/works/{workId}/media")
+    @GetMapping("/{userId}/works/{workId}/media")
     public ResponseEntity<Page<MediaDto>> getWorkMediasPublic(
             @PathVariable Long userId,
             @PathVariable Long workId,

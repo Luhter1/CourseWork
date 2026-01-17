@@ -37,7 +37,7 @@ public class ArtistAchievementController {
      *
      * @return список достижений
      */
-    @GetMapping("/{id}/achievements")
+    @GetMapping("/{userId}/achievements")
     public ResponseEntity<Page<AchievementDto>> getArtistAchievements(
         @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
         @PathVariable Long userId
@@ -87,7 +87,7 @@ public class ArtistAchievementController {
      * @param updateDto      данные для обновления (валидированные)
      * @return обновленное достижение
      */
-    @PutMapping("/me/achievements/{id}")
+    @PutMapping("/me/achievements/{achievementId}")
     @PreAuthorize("hasRole('ARTIST')")
     public ResponseEntity<AchievementDto> updateAchievement(
             @PathVariable Long achievementId,
@@ -102,7 +102,7 @@ public class ArtistAchievementController {
      *
      * @param id             ID достижения
      */
-    @DeleteMapping("/me/achievements/{id}")
+    @DeleteMapping("/me/achievements/{achievementId}")
     @PreAuthorize("hasRole('ARTIST')")
     public ResponseEntity<Void> deleteAchievement(
             @PathVariable Long achievementId) {

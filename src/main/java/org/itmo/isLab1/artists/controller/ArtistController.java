@@ -57,8 +57,8 @@ public class ArtistController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<ArtistProfileDto> getArtistProfile(
-            @PathVariable Long userId) {
-        var obj = artistService.getArtistProfile(userId);
+            @PathVariable Long id) {
+        var obj = artistService.getArtistProfile(id);
 
         return ResponseEntity.ok(obj);
     }
