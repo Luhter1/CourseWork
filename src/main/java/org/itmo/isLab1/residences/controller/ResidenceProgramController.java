@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.itmo.isLab1.common.programs.dto.ResidenceProgramCreateDto;
 import org.itmo.isLab1.common.programs.dto.ResidenceProgramUpdateDto;
 import org.itmo.isLab1.common.programs.dto.ResidenceProgramDto;
+import org.itmo.isLab1.common.programs.dto.ResidenceProgramPreviewDto;
 import org.itmo.isLab1.residences.service.ResidenceProgramService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,9 +35,9 @@ public class ResidenceProgramController {
      */
     @GetMapping
     @PreAuthorize("hasRole('RESIDENCE_ADMIN')")
-    public ResponseEntity<Page<ResidenceProgramDto>> getPrograms(
+    public ResponseEntity<Page<ResidenceProgramPreviewDto>> getPrograms(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<ResidenceProgramDto> page = residenceProgramService.getProgramsByResidenceId(pageable);
+        Page<ResidenceProgramPreviewDto> page = residenceProgramService.getProgramsByResidenceId(pageable);
         return ResponseEntity.ok(page);
     }
 

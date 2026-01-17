@@ -16,6 +16,8 @@ public interface ResidenceProgramRepository extends JpaRepository<ResidenceProgr
 
     Page<ResidenceProgram> findByResidenceId(Long residenceId, Pageable pageable);
 
+    Optional<ResidenceProgram> findById(Long id);
+
     Optional<ResidenceProgram> findByResidenceIdAndId(Long residenceId, Long id);
 
     @Query(

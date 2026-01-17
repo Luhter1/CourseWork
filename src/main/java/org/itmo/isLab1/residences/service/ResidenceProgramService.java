@@ -6,6 +6,7 @@ import org.itmo.isLab1.common.errors.ResourceNotFoundException;
 import org.itmo.isLab1.common.programs.dto.ResidenceProgramCreateDto;
 import org.itmo.isLab1.common.programs.dto.ResidenceProgramUpdateDto;
 import org.itmo.isLab1.common.programs.dto.ResidenceProgramDto;
+import org.itmo.isLab1.common.programs.dto.ResidenceProgramPreviewDto;
 import org.itmo.isLab1.common.programs.entity.ResidenceProgram;
 import org.itmo.isLab1.common.programs.mapper.ResidenceProgramMapper;
 import org.itmo.isLab1.common.programs.repository.ResidenceProgramRepository;
@@ -38,21 +39,20 @@ public class ResidenceProgramService {
     /**
      * Возвращает пагинированный список программ для резиденции текущего пользователя
      *
-     * @param residenceId идентификатор резиденции
      * @param pageable    параметры пагинации
      * @return страница с программами резиденции
      * @throws ResourceNotFoundException если резиденция не найдена
      * @throws PolicyViolationError       если пользователь не является владельцем резиденции
      */
     @Transactional(readOnly = true)
-    public Page<ResidenceProgramDto> getProgramsByResidenceId(Pageable pageable) {
+    public Page<ResidenceProgramPreviewDto> getProgramsByResidenceId(Pageable pageable) {
 
         User currentUser = getCurrentUser();
         ResidenceDetails residence = residenceDetailsRepository.findByUserId(currentUser.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("У вас нет резиденции"));
 
         return residenceProgramRepository.findByResidenceId(residence.getId(), pageable)
-            .map(residenceProgramMapper::toDto);
+            .map(residenceProgramMapper::toPreviewDto);
     }
 
     /**
