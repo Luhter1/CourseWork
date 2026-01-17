@@ -170,7 +170,7 @@ curl -X POST "http://localhost:15123/api/artists/me/works/1/media" \
 
 # профили резиденции
 curl -X POST http://localhost:15123/api/residences/me \
-  -H "Authorization: Bearer $ACCESS_TOKEN" \
+  -H "Authorization: Bearer $ROLE_RESIDENCE_ADMIN" \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Резиденция Альфа",
@@ -185,11 +185,11 @@ curl -X POST http://localhost:15123/api/residences/me \
 
 # получение своего профиля резиденции
 curl -X GET http://localhost:15123/api/residences/me \
-  -H "Authorization: Bearer $ACCESS_TOKEN"
+  -H "Authorization: Bearer $ROLE_RESIDENCE_ADMIN"
 
 # обновление своего профиля резиденции
 curl -X PUT http://localhost:15123/api/residences/me \
--H "Authorization: Bearer $ACCESS_TOKEN" \
+-H "Authorization: Bearer $ROLE_RESIDENCE_ADMIN" \
 -H "Content-Type: application/json" \
 -d '{
   "title": "Резиденция Альфа (обновлённая 2)",
@@ -203,7 +203,7 @@ curl -X PUT http://localhost:15123/api/residences/me \
 
 
 # получение статуса валидации своего профиля резиденции
-curl -X GET http://localhost:15123/api/residences/me/validation-status   -H "Authorization: Bearer $ACCESS_TOKEN"
+curl -X GET http://localhost:15123/api/residences/me/validation-status   -H "Authorization: Bearer $ROLE_RESIDENCE_ADMIN"
 
 # профиль резиденции по ID
 curl -X GET http://localhost:15123/api/residences/1
@@ -230,3 +230,12 @@ curl -X POST "http://localhost:15123/api/admin/validation-requests/1/reject" \
     "comment": "Недостаточно информации для подтверждения"
   }'
 
+# cообщения
+curl -X GET "http://localhost:15123/api/notifications" \
+  -H "Authorization: Bearer $TOKEN"
+
+curl -X GET "http://localhost:15123/api/notifications/unread-count" \
+  -H "Authorization: Bearer $TOKEN"
+
+curl -X GET "http://localhost:15123/api/notifications/read-all" \
+  -H "Authorization: Bearer $TOKEN"

@@ -40,7 +40,7 @@ public class Notification implements BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    @Column(name = "type", nullable = false)
+    @Column(name = "category", nullable = false)
     @NotNull(message = "Notification category is required")
     @ColumnTransformer(write="?::art2art_notification_category")
     private NotificationCategory category;

@@ -50,7 +50,7 @@ CREATE TYPE art2art_notification_category AS ENUM (
     'INVITE', 
     'REVIEW', 
     'STATUS'
-)
+);
 
 -- таблица пользователей
 CREATE TABLE art2art_users (
@@ -216,7 +216,7 @@ CREATE TABLE art2art_notifications (
     user_id       BIGINT NOT NULL REFERENCES art2art_users(id) ON DELETE CASCADE,
     message       TEXT NOT NULL,
     link          TEXT,
-    category      VARCHAR(50) CHECK (category IN ('system', 'invite', 'review', 'status')),
+    category      art2art_notification_category NOT NULL,
     read_at       TIMESTAMP,
     created_at    TIMESTAMP DEFAULT now()
 );

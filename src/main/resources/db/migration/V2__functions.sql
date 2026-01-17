@@ -4,7 +4,7 @@
 CREATE OR REPLACE FUNCTION create_notification(
     p_email VARCHAR,
     p_message TEXT,
-    p_category VARCHAR,
+    p_category art2art_notification_category,
     p_link TEXT DEFAULT NULL
 ) RETURNS BIGINT
 LANGUAGE plpgsql
@@ -197,7 +197,7 @@ BEGIN
     PERFORM create_notification(
         (SELECT rd.user_id FROM art2art_residence_details rd JOIN art2art_programs p ON p.residence_id = rd.id WHERE p.id = p_program_id LIMIT 1),
         format('New application %s from artist %s', v_application_id, p_artist_user_id),
-        'review',
+        'REVIEW',
         NULL
     );
 
@@ -247,7 +247,7 @@ BEGIN
     PERFORM create_notification(
         (SELECT rd.user_id FROM art2art_residence_details rd JOIN art2art_programs p ON p.residence_id = rd.id WHERE p.id = v_app.program_id LIMIT 1),
         format('Artist %s confirmed participation for application %s', p_artist_user_id, p_application_id),
-        'status',
+        'STATUS',
         NULL
     );
 END;
@@ -287,7 +287,7 @@ BEGIN
     PERFORM create_notification(
         (SELECT rd.user_id FROM art2art_residence_details rd JOIN art2art_programs p ON p.residence_id = rd.id WHERE p.id = v_app.program_id LIMIT 1),
         format('Artist %s declined participation for application %s', p_artist_user_id, p_application_id),
-        'status',
+        'STATUS',
         NULL
     );
 
@@ -345,7 +345,7 @@ BEGIN
     -- уведомление эксперта
     PERFORM create_notification(p_expert_user_id,
         format('You have been assigned as expert to program %s', p_program_id),
-        'invite',
+        'INVITE',
         NULL
     );
 
@@ -377,7 +377,7 @@ BEGIN
     END IF;
 
     DELETE FROM art2art_program_experts WHERE program_id = p_program_id AND user_id = p_expert_user_id;
-    PERFORM create_notification(p_expert_user_id, format('You have been unassigned from program %s', p_program_id), 'system', NULL);
+    PERFORM create_notification(p_expert_user_id, format('You have been unassigned from program %s', p_program_id), 'SYSTEM', NULL);
 END;
 $$;
 
@@ -445,7 +445,7 @@ BEGIN
     -- уведомить художника
     PERFORM create_notification(v_app.artist_id,
         format('Your application %s received a new evaluation by expert %s', p_application_id, p_expert_user_id),
-        'review',
+        'REVIEW',
         NULL
     );
 
@@ -550,7 +550,7 @@ BEGIN
     PERFORM create_notification(
         (SELECT email FROM art2art_users WHERE id = p_user_id),
         format('Профиль резиденции "%s" создан. Заявка на валидацию отправлена на рассмотрение', p_title, v_residence_id),
-        'status',
+        'STATUS',
         NULL
     );
     
