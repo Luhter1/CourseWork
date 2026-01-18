@@ -120,6 +120,15 @@ public class ArtistController {
         return ResponseEntity.ok(page);
     }
 
+    @GetMapping("/me/applications/history")
+    @PreAuthorize("hasRole('ARTIST')")
+    public ResponseEntity<Page<ApplicationDto>> getAllMyApplications(
+            @PageableDefault(size = 20, sort = "submittedAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        Page<ApplicationDto> page = applicationService.getAllMyApplications(pageable);
+        return ResponseEntity.ok(page);
+    }
+
     @PostMapping("/me/applications/{id}/confirm")
     @PreAuthorize("hasRole('ARTIST')")
     public ResponseEntity<ApplicationDto> confirmMyApplication(

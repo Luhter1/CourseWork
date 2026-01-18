@@ -2,6 +2,8 @@ package org.itmo.isLab1.applications.service;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 import org.itmo.isLab1.applications.dto.ApplicationCreateDto;
 import org.itmo.isLab1.applications.dto.ApplicationDto;
 import org.itmo.isLab1.applications.entity.Application;
@@ -25,6 +27,19 @@ public class ApplicationService {
     private final ApplicationMapper applicationMapper;
 
     public Page<ApplicationDto> getMyApplications(Pageable pageable) {
+    User currentUser = userService.getCurrentUser();
+
+        List<ApplicationRequestEnum> statuses = List.of(
+            ApplicationRequestEnum.SENT,
+            ApplicationRequestEnum.REVIEWED,
+            ApplicationRequestEnum.RESERVE
+        );
+
+        return applicationRepository.findAllByArtistAndStatusIn(currentUser, statuses, pageable)
+                .map(applicationMapper::toApplicationDto);
+    }
+
+    public Page<ApplicationDto> getAllMyApplications(Pageable pageable) {
         User currentUser = userService.getCurrentUser();
 
         return applicationRepository.findAllByArtist(currentUser, pageable)
