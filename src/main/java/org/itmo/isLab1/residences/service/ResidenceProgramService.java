@@ -17,7 +17,6 @@ import org.itmo.isLab1.residences.entity.ResidenceDetails;
 import org.itmo.isLab1.residences.repository.ResidenceDetailsRepository;
 import org.itmo.isLab1.users.User;
 import org.itmo.isLab1.users.UserRepository;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -170,55 +169,27 @@ public class ResidenceProgramService {
             throw new IllegalArgumentException("Невозможно сериализовать цели или условия в JSON: " + e.getMessage(), e);
         }
         
-        Long programId;
-        try {
-            programId = residenceProgramRepository.createProgram(
-                    residence.getId(),
-                    createDto.getTitle(),
-                    createDto.getDescription(),
-                    goals,
-                    conditions,
-                    createDto.getDeadlineApply(),
-                    createDto.getDeadlineReview(),
-                    createDto.getDeadlineNotify(),
-                    createDto.getDurationDays(),
-                    createDto.getBudgetQuota(),
-                    createDto.getPeopleQuota(),
-                    currentUser.getId()
-            );
-        } catch (DataAccessException e) {
-            String errorMessage = extractDatabaseErrorMessage(e);
-            throw new IllegalArgumentException("Не удалось создать программу: " + errorMessage, e);
-        }
+        Long programId = residenceProgramRepository.createProgram(
+                residence.getId(),
+                createDto.getTitle(),
+                createDto.getDescription(),
+                goals,
+                conditions,
+                createDto.getDeadlineApply(),
+                createDto.getDeadlineReview(),
+                createDto.getDeadlineNotify(),
+                createDto.getDurationDays(),
+                createDto.getBudgetQuota(),
+                createDto.getPeopleQuota(),
+                currentUser.getId()
+        );
+
 
         // Получаем созданную программу
         Program program = residenceProgramRepository.findById(programId)
                 .orElseThrow(() -> new ResourceNotFoundException("Программа не найдена после создания с id " + programId));
 
         return residenceProgramMapper.toDto(program);
-    }
-
-    /**
-     * Извлекает сообщение об ошибке из исключения доступа к данным
-     *
-     * @param e исключение DataAccessException
-     * @return сообщение об ошибке
-     */
-    private String extractDatabaseErrorMessage(DataAccessException e) {
-        Throwable cause = e.getRootCause();
-        if (cause != null && cause.getMessage() != null) {
-            String message = cause.getMessage();
-            // Извлекаем сообщение после "ERROR:" или берем все сообщение
-            if (message.contains("ERROR:")) {
-                int startIndex = message.indexOf("ERROR:") + 6;
-                int endIndex = message.indexOf("\n", startIndex);
-                if (endIndex > startIndex) {
-                    return message.substring(startIndex, endIndex).trim();
-                }
-            }
-            return message;
-        }
-        return e.getMessage() != null ? e.getMessage() : "Неизвестная ошибка базы данных";
     }
 
     /**

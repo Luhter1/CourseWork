@@ -52,11 +52,11 @@ public class NotificationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Пользователь с email " + email + " не найден"));
 
         Long notificationId = notificationRepository.createNotification(
-                    email,
-                    message,
-                    category.name(),
-                    link
-                );
+            email,
+            message,
+            category.name(),
+            link
+        );
 
         return notificationId;
     }

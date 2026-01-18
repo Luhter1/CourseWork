@@ -12,7 +12,6 @@ import org.itmo.isLab1.residences.mapper.ResidenceDetailsMapper;
 import org.itmo.isLab1.residences.repository.ResidenceDetailsRepository;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
 import org.itmo.isLab1.common.errors.PolicyViolationError;
-import org.springframework.dao.DataAccessException;
 import org.itmo.isLab1.users.User;
 import org.itmo.isLab1.users.UserRepository;
 import org.springframework.data.domain.Page;
@@ -50,40 +49,18 @@ public class ResidenceDetailsService {
             throw new IllegalArgumentException("Невозможно сериализовать контакты в JSON: " + e.getMessage(), e);
         }
         
-        Long id;
-        try {
-            id = repository.createResidenceProfile(
-                    dto.getTitle(),
-                    dto.getDescription(),
-                    dto.getLocation(),
-                    contactsJson,
-                    userId
-            );
-        } catch (DataAccessException e) {
-            String errorMessage = extractDatabaseErrorMessage(e);
-            throw new IllegalStateException("Не удалось создать профиль резиденции: " + errorMessage, e);
-        }
+        Long id = repository.createResidenceProfile(
+            dto.getTitle(),
+            dto.getDescription(),
+            dto.getLocation(),
+            contactsJson,
+            userId
+        );
+
         
         ResidenceDetails details = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Профиль резиденции не найден после создания"));
         return mapper.toResidenceDetailsWithValidation(details);
-    }
-    
-    private String extractDatabaseErrorMessage(DataAccessException e) {
-        Throwable cause = e.getRootCause();
-        if (cause != null && cause.getMessage() != null) {
-            String message = cause.getMessage();
-            // Извлекаем сообщение после "ERROR:" или берем все сообщение
-            if (message.contains("ERROR:")) {
-                int startIndex = message.indexOf("ERROR:") + 6;
-                int endIndex = message.indexOf("\n", startIndex);
-                if (endIndex > startIndex) {
-                    return message.substring(startIndex, endIndex).trim();
-                }
-            }
-            return message;
-        }
-        return e.getMessage() != null ? e.getMessage() : "Неизвестная ошибка базы данных";
     }
 
     /**

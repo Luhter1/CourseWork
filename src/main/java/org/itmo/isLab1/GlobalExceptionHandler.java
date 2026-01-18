@@ -14,6 +14,7 @@ import org.itmo.isLab1.common.errors.UserWithThisUsernameAlreadyExists;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -32,6 +33,35 @@ public class GlobalExceptionHandler {
         private String message;
         private long timestamp;
         private java.util.Map<String, String> fieldErrors;
+    }
+
+    @ExceptionHandler(JpaSystemException.class)
+    public ResponseEntity<ErrorResponse> handleJpaSystemException(JpaSystemException ex) {
+        Throwable cause = ex.getRootCause();
+        String message;
+
+        if (cause != null && cause.getMessage() != null) {
+            message = cause.getMessage();
+
+            if (message.contains("ERROR:")) {
+                int startIndex = message.indexOf("ERROR:") + 6;
+                int endIndex = message.indexOf("\n", startIndex);
+                if (endIndex > startIndex) {
+                    message = message.substring(startIndex, endIndex).trim();
+                }
+            }
+        }else{
+
+            message = ex.getMessage() != null ? ex.getMessage() : "Неизвестная ошибка базы данных";
+        }
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .status(HttpStatus.CONFLICT.value())
+                .message(message)
+                .timestamp(System.currentTimeMillis())
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(EntityDuplicateException.class)

@@ -78,7 +78,8 @@ public class SecurityConfiguration {
                 request.requestMatchers(HttpMethod.POST, "/api/artists/me/**").hasRole("ARTIST")
                       .requestMatchers(HttpMethod.PUT, "/api/artists/me/**").hasRole("ARTIST")
                       .requestMatchers(HttpMethod.DELETE, "/api/artists/me/**").hasRole("ARTIST")
-                      .requestMatchers(HttpMethod.GET, "/api/artists/me/**").hasRole("ARTIST");
+                      .requestMatchers(HttpMethod.GET, "/api/artists/me/**").hasRole("ARTIST")
+                      .requestMatchers(HttpMethod.POST, "/api/artists/invite").hasRole("RESIDENCE_ADMIN");
 
                 // Публичный доступ к просмотру residences (проверка публикации в сервисе)
                 request.requestMatchers(HttpMethod.GET, "/api/residences/**").permitAll();

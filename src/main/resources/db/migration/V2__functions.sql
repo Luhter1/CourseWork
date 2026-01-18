@@ -16,11 +16,11 @@ BEGIN
     -- Находим пользователя по email
     SELECT id INTO v_user_id
     FROM art2art_users
-    WHERE email = p_email
+    WHERE email = p_email AND role = 'ROLE_ARTIST'
     LIMIT 1;
 
     IF v_user_id IS NULL THEN
-        RAISE EXCEPTION 'Пользователь с email "%" не найден', p_email;
+        RAISE EXCEPTION 'Художник с email "%" не найден', p_email;
     END IF;
 
     -- Создаем уведомление
