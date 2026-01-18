@@ -203,22 +203,22 @@ BEGIN
         RAISE EXCEPTION 'Artist % is not owner of application %', p_artist_user_id, p_application_id;
     END IF;
 
-    IF v_app.status <> 'approved' THEN
+    IF v_app.status <> 'APPROVED' THEN
         RAISE EXCEPTION 'Application must have status = approved to confirm; current = %', v_app.status;
     END IF;
 
     UPDATE art2art_application_requests
-    SET status = 'confirmed',
+    SET status = 'CONFIRMED',
         updated_at = now()
     WHERE id = p_application_id;
 
     -- уведомить админа резиденции
-    PERFORM create_notification(
-        (SELECT rd.user_id FROM art2art_residence_details rd JOIN art2art_programs p ON p.residence_id = rd.id WHERE p.id = v_app.program_id LIMIT 1),
-        format('Artist %s confirmed participation for application %s', p_artist_user_id, p_application_id),
-        'STATUS',
-        NULL
-    );
+    -- PERFORM create_notification(
+    --     (SELECT rd.user_id FROM art2art_residence_details rd JOIN art2art_programs p ON p.residence_id = rd.id WHERE p.id = v_app.program_id LIMIT 1),
+    --     format('Artist %s confirmed participation for application %s', p_artist_user_id, p_application_id),
+    --     'STATUS',
+    --     NULL
+    -- );
 END;
 $$;
 
@@ -243,22 +243,22 @@ BEGIN
         RAISE EXCEPTION 'Artist % is not owner of application %', p_artist_user_id, p_application_id;
     END IF;
 
-    IF v_app.status <> 'approved' THEN
+    IF v_app.status <> 'APPROVED' THEN
         RAISE EXCEPTION 'Only approved applications can be declined by artist; current status = %', v_app.status;
     END IF;
 
     UPDATE art2art_application_requests
-    SET status = 'declined_by_artist',
+    SET status = 'DECLINED_BY_ARTIST',
         updated_at = now()
     WHERE id = p_application_id;
 
     -- уведомить админа резиденции
-    PERFORM create_notification(
-        (SELECT rd.user_id FROM art2art_residence_details rd JOIN art2art_programs p ON p.residence_id = rd.id WHERE p.id = v_app.program_id LIMIT 1),
-        format('Artist %s declined participation for application %s', p_artist_user_id, p_application_id),
-        'STATUS',
-        NULL
-    );
+    -- PERFORM create_notification(
+    --     (SELECT rd.user_id FROM art2art_residence_details rd JOIN art2art_programs p ON p.residence_id = rd.id WHERE p.id = v_app.program_id LIMIT 1),
+    --     format('Artist %s declined participation for application %s', p_artist_user_id, p_application_id),
+    --     'STATUS',
+    --     NULL
+    -- );
 
 END;
 $$;
@@ -312,11 +312,11 @@ BEGIN
 
 
     -- уведомление эксперта
-    PERFORM create_notification(p_expert_user_id,
-        format('You have been assigned as expert to program %s', p_program_id),
-        'INVITE',
-        NULL
-    );
+    -- PERFORM create_notification(p_expert_user_id,
+    --     format('You have been assigned as expert to program %s', p_program_id),
+    --     'INVITE',
+    --     NULL
+    -- );
 
     RETURN v_id;
 END;
@@ -346,7 +346,11 @@ BEGIN
     END IF;
 
     DELETE FROM art2art_program_experts WHERE program_id = p_program_id AND user_id = p_expert_user_id;
-    PERFORM create_notification(p_expert_user_id, format('You have been unassigned from program %s', p_program_id), 'SYSTEM', NULL);
+    -- PERFORM create_notification(p_expert_user_id, 
+    --     format('You have been unassigned from program %s', p_program_id), 
+    --     'SYSTEM', 
+    --     NULL
+    -- );
 END;
 $$;
 
@@ -401,24 +405,24 @@ BEGIN
       );
 
     IF v_remaining = 0 THEN
-        UPDATE art2art_application_requests SET status = 'reviewed', updated_at = now() WHERE id = p_application_id;
+        UPDATE art2art_application_requests SET status = 'REVIEWED', updated_at = now() WHERE id = p_application_id;
         -- уведомить администратора
-        PERFORM create_notification(
-            (SELECT rd.user_id FROM art2art_residence_details rd JOIN art2art_programs p ON p.residence_id = rd.id WHERE p.id = v_app.program_id LIMIT 1),
-            format('Application %s has been fully reviewed', p_application_id),
-            'status',
-            NULL
-        );
+        -- PERFORM create_notification(
+        --     (SELECT rd.user_id FROM art2art_residence_details rd JOIN art2art_programs p ON p.residence_id = rd.id WHERE p.id = v_app.program_id LIMIT 1),
+        --     format('Application %s has been fully reviewed', p_application_id),
+        --     'status',
+        --     NULL
+        -- );
     END IF;
 
     -- уведомить художника
-    PERFORM create_notification(v_app.artist_id,
-        format('Your application %s received a new evaluation by expert %s', p_application_id, p_expert_user_id),
-        'REVIEW',
-        NULL
-    );
+    -- PERFORM create_notification(v_app.artist_id,
+    --     format('Your application %s received a new evaluation by expert %s', p_application_id, p_expert_user_id),
+    --     'REVIEW',
+    --     NULL
+    -- );
 
-    RETURN v_eval_id;
+    RETURN v_remaining;
 END;
 $$;
 
@@ -516,12 +520,12 @@ BEGIN
     ON CONFLICT (residence_id) DO NOTHING;
     
     -- Создать уведомление для администратора резиденции
-    PERFORM create_notification(
-        (SELECT email FROM art2art_users WHERE id = p_user_id),
-        format('Профиль резиденции "%s" создан. Заявка на валидацию отправлена на рассмотрение', p_title, v_residence_id),
-        'STATUS',
-        NULL
-    );
+    -- PERFORM create_notification(
+    --     (SELECT email FROM art2art_users WHERE id = p_user_id),
+    --     format('Профиль резиденции "%s" создан. Заявка на валидацию отправлена на рассмотрение', p_title, v_residence_id),
+    --     'STATUS',
+    --     NULL
+    -- );
     
     -- 5. Вернуть идентификатор созданной резиденции
     RETURN v_residence_id;

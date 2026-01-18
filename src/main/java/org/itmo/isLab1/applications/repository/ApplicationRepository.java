@@ -39,4 +39,32 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
         @Param("programId") Long programId,
         @Param("motivation") String motivation
     );
+
+    @Query(
+        value = """
+            select confirm_participation(
+                :applicationId, 
+                :userId
+            )
+            """, 
+        nativeQuery = true
+    )
+    void confirmApplication(
+        @Param("applicationId") Long applicationId,
+        @Param("userId") Long userId
+    );
+
+    @Query(
+        value = """
+            select decline_participation(
+                :applicationId, 
+                :userId
+            )
+            """, 
+        nativeQuery = true
+    )
+    void declineApplication(
+        @Param("applicationId") Long applicationId,
+        @Param("userId") Long userId
+    );
 }

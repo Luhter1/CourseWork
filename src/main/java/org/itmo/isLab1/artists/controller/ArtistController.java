@@ -131,19 +131,17 @@ public class ArtistController {
 
     @PostMapping("/me/applications/{id}/confirm")
     @PreAuthorize("hasRole('ARTIST')")
-    public ResponseEntity<ApplicationDto> confirmMyApplication(
+    public ResponseEntity<Void> confirmMyApplication(
             @PathVariable Long id) {
-
-        ApplicationDto application = applicationService.confirmMyApplication(id);
-        return ResponseEntity.ok(application);
+        applicationService.confirmMyApplication(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PostMapping("/me/applications/{id}/decline")
     @PreAuthorize("hasRole('ARTIST')")
-    public ResponseEntity<ApplicationDto> declineMyApplication(
+    public ResponseEntity<Void> declineMyApplication(
             @PathVariable Long id) {
-
-        ApplicationDto application = applicationService.declineMyApplication(id);
-        return ResponseEntity.ok(application);
+        applicationService.declineMyApplication(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
