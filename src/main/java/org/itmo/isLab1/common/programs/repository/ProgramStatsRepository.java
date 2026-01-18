@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ResidenceProgramStatsRepository extends JpaRepository<ProgramStats, Long> {
+public interface ProgramStatsRepository extends JpaRepository<ProgramStats, Long> {
     @Query(
         value = """
             select log_program_view(

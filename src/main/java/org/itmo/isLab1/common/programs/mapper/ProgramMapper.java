@@ -3,12 +3,12 @@ package org.itmo.isLab1.common.programs.mapper;
 import org.itmo.isLab1.common.mapper.JsonNullableMapper;
 import org.itmo.isLab1.common.mapper.ReferenceMapper;
 import org.itmo.isLab1.common.programs.dto.ProgramStatsDto;
-import org.itmo.isLab1.common.programs.dto.ResidenceProgramCreateDto;
-import org.itmo.isLab1.common.programs.dto.ResidenceProgramDto;
-import org.itmo.isLab1.common.programs.dto.ResidenceProgramPreviewDto;
-import org.itmo.isLab1.common.programs.dto.ResidenceProgramUpdateDto;
+import org.itmo.isLab1.common.programs.dto.ProgramCreateDto;
+import org.itmo.isLab1.common.programs.dto.ProgramDto;
+import org.itmo.isLab1.common.programs.dto.ProgramPreviewDto;
+import org.itmo.isLab1.common.programs.dto.ProgramUpdateDto;
 import org.itmo.isLab1.common.programs.entity.ProgramStats;
-import org.itmo.isLab1.common.programs.entity.ResidenceProgram;
+import org.itmo.isLab1.common.programs.entity.Program;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
@@ -22,22 +22,22 @@ import org.mapstruct.ReportingPolicy;
     componentModel = MappingConstants.ComponentModel.SPRING,
     unmappedTargetPolicy = ReportingPolicy.IGNORE
 )
-public interface ResidenceProgramMapper {
+public interface ProgramMapper {
 
     ProgramStatsDto toStatDto(ProgramStats entity);
 
     @Mapping(target = "previewDto", expression = "java(toPreviewDto(entity))")
-    ResidenceProgramDto toDto(ResidenceProgram entity);
+    ProgramDto toDto(Program entity);
 
     @Mapping(source = "residence.id", target = "residenceId")
-    ResidenceProgramPreviewDto toPreviewDto(ResidenceProgram entity);
+    ProgramPreviewDto toPreviewDto(Program entity);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "furtherActionsSentAt", ignore = true)
     @Mapping(target = "isPublished", ignore = true)
-    ResidenceProgram toEntity(ResidenceProgramCreateDto createDto);
+    Program toEntity(ProgramCreateDto createDto);
 
-    void updateEntity(ResidenceProgramUpdateDto updateDto, @MappingTarget ResidenceProgram entity);
+    void updateEntity(ProgramUpdateDto updateDto, @MappingTarget Program entity);
 }

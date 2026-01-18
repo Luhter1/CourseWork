@@ -1,6 +1,6 @@
 package org.itmo.isLab1.common.programs.repository;
 
-import org.itmo.isLab1.common.programs.entity.ResidenceProgram;
+import org.itmo.isLab1.common.programs.entity.Program;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,15 +12,15 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 @Repository
-public interface ResidenceProgramRepository extends JpaRepository<ResidenceProgram, Long> {
+public interface ProgramRepository extends JpaRepository<Program, Long> {
 
-    Page<ResidenceProgram> findByResidenceId(Long residenceId, Pageable pageable);
+    Page<Program> findByResidenceId(Long residenceId, Pageable pageable);
 
-    Optional<ResidenceProgram> findById(Long id);
+    Optional<Program> findById(Long id);
 
-    Optional<ResidenceProgram> findByResidenceIdAndId(Long residenceId, Long id);
+    Optional<Program> findByResidenceIdAndId(Long residenceId, Long id);
 
-    Page<ResidenceProgram> findByIsPublishedTrue(Pageable pageable);
+    Page<Program> findByIsPublishedTrue(Pageable pageable);
 
     @Query(
         value = """

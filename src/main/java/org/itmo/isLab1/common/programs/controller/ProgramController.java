@@ -25,9 +25,9 @@ public class ProgramController {
      * @return страница с программами резиденции
      */
     @GetMapping
-    public ResponseEntity<Page<ResidenceProgramPreviewDto>> getPrograms(
+    public ResponseEntity<Page<ProgramPreviewDto>> getPrograms(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<ResidenceProgramPreviewDto> page = programService.getPrograms(pageable);
+        Page<ProgramPreviewDto> page = programService.getPrograms(pageable);
         return ResponseEntity.ok(page);
     }
 
@@ -38,9 +38,9 @@ public class ProgramController {
      * @return страница с программами резиденции
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ResidenceProgramDto> getProgramById(
+    public ResponseEntity<ProgramDto> getProgramById(
             @PathVariable Long id) {
-        ResidenceProgramDto program = programService.getProgramById(id);
+        ProgramDto program = programService.getProgramById(id);
         return ResponseEntity.ok(program);
     }
 }

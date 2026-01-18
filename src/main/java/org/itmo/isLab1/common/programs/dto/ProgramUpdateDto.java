@@ -18,7 +18,7 @@ import lombok.AllArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResidenceProgramUpdateDto {
+public class ProgramUpdateDto {
     @NotBlank(message = "Название не может быть пустым")
     @Size(max = 255, message = "Название должно содержать максимум 255 символов")
     private JsonNullable<String> title;

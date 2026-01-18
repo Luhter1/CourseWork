@@ -4,15 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.itmo.isLab1.common.errors.PolicyViolationError;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
 import org.itmo.isLab1.common.programs.dto.ProgramStatsDto;
-import org.itmo.isLab1.common.programs.dto.ResidenceProgramCreateDto;
-import org.itmo.isLab1.common.programs.dto.ResidenceProgramUpdateDto;
-import org.itmo.isLab1.common.programs.dto.ResidenceProgramDto;
-import org.itmo.isLab1.common.programs.dto.ResidenceProgramPreviewDto;
+import org.itmo.isLab1.common.programs.dto.ProgramCreateDto;
+import org.itmo.isLab1.common.programs.dto.ProgramUpdateDto;
+import org.itmo.isLab1.common.programs.dto.ProgramDto;
+import org.itmo.isLab1.common.programs.dto.ProgramPreviewDto;
 import org.itmo.isLab1.common.programs.entity.ProgramStats;
-import org.itmo.isLab1.common.programs.entity.ResidenceProgram;
-import org.itmo.isLab1.common.programs.mapper.ResidenceProgramMapper;
-import org.itmo.isLab1.common.programs.repository.ResidenceProgramRepository;
-import org.itmo.isLab1.common.programs.repository.ResidenceProgramStatsRepository;
+import org.itmo.isLab1.common.programs.entity.Program;
+import org.itmo.isLab1.common.programs.mapper.ProgramMapper;
+import org.itmo.isLab1.common.programs.repository.ProgramRepository;
+import org.itmo.isLab1.common.programs.repository.ProgramStatsRepository;
 import org.itmo.isLab1.residences.entity.ResidenceDetails;
 import org.itmo.isLab1.residences.repository.ResidenceDetailsRepository;
 import org.itmo.isLab1.users.User;
@@ -34,11 +34,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ResidenceProgramService {
 
     private final ObjectMapper objectMapper;
-    private final ResidenceProgramRepository residenceProgramRepository;
-    private final ResidenceProgramMapper residenceProgramMapper;
+    private final ProgramRepository residenceProgramRepository;
+    private final ProgramMapper residenceProgramMapper;
     private final UserRepository userRepository;
     private final ResidenceDetailsRepository residenceDetailsRepository;
-    private final ResidenceProgramStatsRepository residenceProgramStatsRepository;
+    private final ProgramStatsRepository residenceProgramStatsRepository;
 
     /**
      * Возвращает пагинированный список программ для резиденции текущего пользователя
@@ -49,7 +49,7 @@ public class ResidenceProgramService {
      * @throws PolicyViolationError       если пользователь не является владельцем резиденции
      */
     @Transactional(readOnly = true)
-    public Page<ResidenceProgramPreviewDto> getProgramsByResidenceId(Pageable pageable) {
+    public Page<ProgramPreviewDto> getProgramsByResidenceId(Pageable pageable) {
 
         User currentUser = getCurrentUser();
         ResidenceDetails residence = residenceDetailsRepository.findByUserId(currentUser.getId())
@@ -69,14 +69,14 @@ public class ResidenceProgramService {
      * @throws PolicyViolationError       если пользователь не является владельцем резиденции
      */
     @Transactional(readOnly = true)
-    public ResidenceProgramDto getProgramById(Long programId) {
+    public ProgramDto getProgramById(Long programId) {
 
         User currentUser = getCurrentUser();
         ResidenceDetails residence = residenceDetailsRepository.findByUserId(currentUser.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("У вас нет резиденции"));
 
         // Проверяем принадлежность программы к резиденции
-        ResidenceProgram program = residenceProgramRepository.findByResidenceIdAndId(residence.getId(), programId)
+        Program program = residenceProgramRepository.findByResidenceIdAndId(residence.getId(), programId)
                 .orElseThrow(() -> new ResourceNotFoundException("Программа с id " + programId + " не найдена для резиденции"));
 
         return residenceProgramMapper.toDto(program);
@@ -84,14 +84,14 @@ public class ResidenceProgramService {
 
 
     @Transactional
-    public ResidenceProgramDto publishProgram(Long programId) {
+    public ProgramDto publishProgram(Long programId) {
 
         User currentUser = getCurrentUser();
         ResidenceDetails residence = residenceDetailsRepository.findByUserId(currentUser.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("У вас нет резиденции"));
 
 
-        ResidenceProgram program = residenceProgramRepository.findByResidenceIdAndId(residence.getId(), programId)
+        Program program = residenceProgramRepository.findByResidenceIdAndId(residence.getId(), programId)
                 .orElseThrow(() -> new ResourceNotFoundException("У вам нет программы с id " + programId));
 
         program.setIsPublished(true);
@@ -102,14 +102,14 @@ public class ResidenceProgramService {
     }
 
     @Transactional
-    public ResidenceProgramDto unpublishProgram(Long programId) {
+    public ProgramDto unpublishProgram(Long programId) {
 
         User currentUser = getCurrentUser();
         ResidenceDetails residence = residenceDetailsRepository.findByUserId(currentUser.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("У вас нет резиденции"));
 
 
-        ResidenceProgram program = residenceProgramRepository.findByResidenceIdAndId(residence.getId(), programId)
+        Program program = residenceProgramRepository.findByResidenceIdAndId(residence.getId(), programId)
                 .orElseThrow(() -> new ResourceNotFoundException("У вам нет программы с id " + programId));
 
         program.setIsPublished(false);
@@ -129,14 +129,14 @@ public class ResidenceProgramService {
      * @throws IllegalArgumentException    при ошибках валидации данных
      */
     @Transactional
-    public ResidenceProgramDto updateProgram(Long programId, ResidenceProgramUpdateDto updateDto) {
+    public ProgramDto updateProgram(Long programId, ProgramUpdateDto updateDto) {
 
         User currentUser = getCurrentUser();
         ResidenceDetails residence = residenceDetailsRepository.findByUserId(currentUser.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("У вас нет резиденции"));
 
 
-        ResidenceProgram program = residenceProgramRepository.findByResidenceIdAndId(residence.getId(), programId)
+        Program program = residenceProgramRepository.findByResidenceIdAndId(residence.getId(), programId)
                 .orElseThrow(() -> new ResourceNotFoundException("У вам нет программы с id " + programId));
 
         residenceProgramMapper.updateEntity(updateDto, program);
@@ -156,7 +156,7 @@ public class ResidenceProgramService {
      * @throws IllegalArgumentException    при ошибках валидации данных
      */
     @Transactional
-    public ResidenceProgramDto createProgram(ResidenceProgramCreateDto createDto) {
+    public ProgramDto createProgram(ProgramCreateDto createDto) {
 
         User currentUser = getCurrentUser();
         ResidenceDetails residence = residenceDetailsRepository.findByUserId(currentUser.getId())
@@ -192,7 +192,7 @@ public class ResidenceProgramService {
         }
 
         // Получаем созданную программу
-        ResidenceProgram program = residenceProgramRepository.findById(programId)
+        Program program = residenceProgramRepository.findById(programId)
                 .orElseThrow(() -> new ResourceNotFoundException("Программа не найдена после создания с id " + programId));
 
         return residenceProgramMapper.toDto(program);

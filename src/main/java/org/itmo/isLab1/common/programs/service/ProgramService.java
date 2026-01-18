@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 
 import org.itmo.isLab1.common.errors.PolicyViolationError;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
-import org.itmo.isLab1.common.programs.dto.ResidenceProgramDto;
-import org.itmo.isLab1.common.programs.dto.ResidenceProgramPreviewDto;
-import org.itmo.isLab1.common.programs.entity.ResidenceProgram;
-import org.itmo.isLab1.common.programs.mapper.ResidenceProgramMapper;
-import org.itmo.isLab1.common.programs.repository.ResidenceProgramRepository;
-import org.itmo.isLab1.common.programs.repository.ResidenceProgramStatsRepository;
+import org.itmo.isLab1.common.programs.dto.ProgramDto;
+import org.itmo.isLab1.common.programs.dto.ProgramPreviewDto;
+import org.itmo.isLab1.common.programs.entity.Program;
+import org.itmo.isLab1.common.programs.mapper.ProgramMapper;
+import org.itmo.isLab1.common.programs.repository.ProgramRepository;
+import org.itmo.isLab1.common.programs.repository.ProgramStatsRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,9 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ProgramService {
     
-    private final ResidenceProgramRepository residenceProgramRepository;
-    private final ResidenceProgramStatsRepository residenceProgramStatsRepository;
-    private final ResidenceProgramMapper residenceProgramMapper;
+    private final ProgramRepository residenceProgramRepository;
+    private final ProgramStatsRepository residenceProgramStatsRepository;
+    private final ProgramMapper residenceProgramMapper;
 
     /**
      * Возвращает список программ
@@ -32,7 +32,7 @@ public class ProgramService {
      * @throws PolicyViolationError       если пользователь не является владельцем резиденции
      */
     @Transactional(readOnly = true)
-    public Page<ResidenceProgramPreviewDto> getPrograms(Pageable pageable) {
+    public Page<ProgramPreviewDto> getPrograms(Pageable pageable) {
         return residenceProgramRepository.findByIsPublishedTrue(pageable)
             .map(residenceProgramMapper::toPreviewDto);
     }
@@ -47,9 +47,9 @@ public class ProgramService {
      * @throws PolicyViolationError       если пользователь не является владельцем резиденции
      */
     @Transactional
-    public ResidenceProgramDto getProgramById(Long programId) {
+    public ProgramDto getProgramById(Long programId) {
 
-        ResidenceProgram program = residenceProgramRepository.findById(programId)
+        Program program = residenceProgramRepository.findById(programId)
                 .orElseThrow(() -> new ResourceNotFoundException("Программа с id " + programId + " не найдена для резиденции"));
 
         if (!program.getIsPublished()) {

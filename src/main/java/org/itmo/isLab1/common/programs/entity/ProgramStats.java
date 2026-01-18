@@ -24,7 +24,7 @@ public class ProgramStats {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "program_id", nullable = false, unique = true)
-    private ResidenceProgram program;
+    private Program program;
 
     @Column(name = "views_count", nullable = false)
     @Builder.Default

@@ -4,10 +4,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.itmo.isLab1.common.programs.dto.ProgramStatsDto;
-import org.itmo.isLab1.common.programs.dto.ResidenceProgramCreateDto;
-import org.itmo.isLab1.common.programs.dto.ResidenceProgramUpdateDto;
-import org.itmo.isLab1.common.programs.dto.ResidenceProgramDto;
-import org.itmo.isLab1.common.programs.dto.ResidenceProgramPreviewDto;
+import org.itmo.isLab1.common.programs.dto.ProgramCreateDto;
+import org.itmo.isLab1.common.programs.dto.ProgramUpdateDto;
+import org.itmo.isLab1.common.programs.dto.ProgramDto;
+import org.itmo.isLab1.common.programs.dto.ProgramPreviewDto;
 import org.itmo.isLab1.residences.service.ResidenceProgramService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,9 +36,9 @@ public class ResidenceProgramController {
      */
     @GetMapping
     @PreAuthorize("hasRole('RESIDENCE_ADMIN')")
-    public ResponseEntity<Page<ResidenceProgramPreviewDto>> getPrograms(
+    public ResponseEntity<Page<ProgramPreviewDto>> getPrograms(
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<ResidenceProgramPreviewDto> page = residenceProgramService.getProgramsByResidenceId(pageable);
+        Page<ProgramPreviewDto> page = residenceProgramService.getProgramsByResidenceId(pageable);
         return ResponseEntity.ok(page);
     }
 
@@ -50,8 +50,8 @@ public class ResidenceProgramController {
      */
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('RESIDENCE_ADMIN')")
-    public ResponseEntity<ResidenceProgramDto> getProgramById(@PathVariable Long id) {
-        ResidenceProgramDto dto = residenceProgramService.getProgramById(id);
+    public ResponseEntity<ProgramDto> getProgramById(@PathVariable Long id) {
+        ProgramDto dto = residenceProgramService.getProgramById(id);
         return ResponseEntity.ok(dto);
     }
 
@@ -63,8 +63,8 @@ public class ResidenceProgramController {
      */
     @PostMapping
     @PreAuthorize("hasRole('RESIDENCE_ADMIN')")
-    public ResponseEntity<ResidenceProgramDto> createProgram(@Valid @RequestBody ResidenceProgramCreateDto createDto) {
-        ResidenceProgramDto dto = residenceProgramService.createProgram(createDto);
+    public ResponseEntity<ProgramDto> createProgram(@Valid @RequestBody ProgramCreateDto createDto) {
+        ProgramDto dto = residenceProgramService.createProgram(createDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
@@ -76,10 +76,10 @@ public class ResidenceProgramController {
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('RESIDENCE_ADMIN')")
-    public ResponseEntity<ResidenceProgramDto> updateProgram(
+    public ResponseEntity<ProgramDto> updateProgram(
                 @PathVariable Long id,
-                @Valid @RequestBody ResidenceProgramUpdateDto updateDto) {
-        ResidenceProgramDto dto = residenceProgramService.updateProgram(id, updateDto);
+                @Valid @RequestBody ProgramUpdateDto updateDto) {
+        ProgramDto dto = residenceProgramService.updateProgram(id, updateDto);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(dto);
     }
 

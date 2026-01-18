@@ -25,7 +25,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "art2art_programs")
-public class ResidenceProgram implements BaseEntity {
+public class Program implements BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "art2art_programs_id_seq")

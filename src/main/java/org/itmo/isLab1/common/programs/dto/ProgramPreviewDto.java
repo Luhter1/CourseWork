@@ -12,7 +12,7 @@ import lombok.AllArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResidenceProgramPreviewDto {
+public class ProgramPreviewDto {
     private Long id;
     private Long residenceId;
     private String title;

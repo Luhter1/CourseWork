@@ -15,8 +15,8 @@ import lombok.AllArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResidenceProgramDto {
-    private ResidenceProgramPreviewDto previewDto;
+public class ProgramDto {
+    private ProgramPreviewDto previewDto;
 
     private String description;
     private Map<String, Object> goals;
