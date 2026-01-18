@@ -1,14 +1,14 @@
-package org.itmo.isLab1.common.programs.mapper;
+package org.itmo.isLab1.programs.mapper;
 
 import org.itmo.isLab1.common.mapper.JsonNullableMapper;
 import org.itmo.isLab1.common.mapper.ReferenceMapper;
-import org.itmo.isLab1.common.programs.dto.ProgramStatsDto;
-import org.itmo.isLab1.common.programs.dto.ProgramCreateDto;
-import org.itmo.isLab1.common.programs.dto.ProgramDto;
-import org.itmo.isLab1.common.programs.dto.ProgramPreviewDto;
-import org.itmo.isLab1.common.programs.dto.ProgramUpdateDto;
-import org.itmo.isLab1.common.programs.entity.ProgramStats;
-import org.itmo.isLab1.common.programs.entity.Program;
+import org.itmo.isLab1.programs.dto.ProgramCreateDto;
+import org.itmo.isLab1.programs.dto.ProgramDto;
+import org.itmo.isLab1.programs.dto.ProgramPreviewDto;
+import org.itmo.isLab1.programs.dto.ProgramStatsDto;
+import org.itmo.isLab1.programs.dto.ProgramUpdateDto;
+import org.itmo.isLab1.programs.entity.Program;
+import org.itmo.isLab1.programs.entity.ProgramStats;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;

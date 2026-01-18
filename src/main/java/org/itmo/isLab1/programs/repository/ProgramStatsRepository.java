@@ -1,6 +1,6 @@
-package org.itmo.isLab1.common.programs.repository;
+package org.itmo.isLab1.programs.repository;
 
-import org.itmo.isLab1.common.programs.entity.ProgramStats;
+import org.itmo.isLab1.programs.entity.ProgramStats;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

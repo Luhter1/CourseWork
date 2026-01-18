@@ -3,11 +3,11 @@ package org.itmo.isLab1.residences.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-import org.itmo.isLab1.common.programs.dto.ProgramStatsDto;
-import org.itmo.isLab1.common.programs.dto.ProgramCreateDto;
-import org.itmo.isLab1.common.programs.dto.ProgramUpdateDto;
-import org.itmo.isLab1.common.programs.dto.ProgramDto;
-import org.itmo.isLab1.common.programs.dto.ProgramPreviewDto;
+import org.itmo.isLab1.programs.dto.ProgramCreateDto;
+import org.itmo.isLab1.programs.dto.ProgramDto;
+import org.itmo.isLab1.programs.dto.ProgramPreviewDto;
+import org.itmo.isLab1.programs.dto.ProgramStatsDto;
+import org.itmo.isLab1.programs.dto.ProgramUpdateDto;
 import org.itmo.isLab1.residences.service.ResidenceProgramService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

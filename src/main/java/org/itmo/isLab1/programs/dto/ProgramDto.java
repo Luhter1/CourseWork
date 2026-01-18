@@ -1,4 +1,4 @@
-package org.itmo.isLab1.common.programs.dto;
+package org.itmo.isLab1.programs.dto;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;

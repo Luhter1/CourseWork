@@ -1,9 +1,9 @@
-package org.itmo.isLab1.common.programs.controller;
+package org.itmo.isLab1.programs.controller;
 
 import lombok.RequiredArgsConstructor;
 
-import org.itmo.isLab1.common.programs.dto.*;
-import org.itmo.isLab1.common.programs.service.ProgramService;
+import org.itmo.isLab1.programs.dto.*;
+import org.itmo.isLab1.programs.service.ProgramService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

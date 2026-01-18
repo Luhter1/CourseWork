@@ -1,4 +1,4 @@
-package org.itmo.isLab1.common.programs.entity;
+package org.itmo.isLab1.programs.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;

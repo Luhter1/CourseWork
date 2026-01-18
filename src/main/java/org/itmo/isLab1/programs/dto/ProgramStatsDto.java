@@ -1,4 +1,4 @@
-package org.itmo.isLab1.common.programs.dto;
+package org.itmo.isLab1.programs.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

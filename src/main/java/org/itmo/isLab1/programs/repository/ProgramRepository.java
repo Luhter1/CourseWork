@@ -1,6 +1,6 @@
-package org.itmo.isLab1.common.programs.repository;
+package org.itmo.isLab1.programs.repository;
 
-import org.itmo.isLab1.common.programs.entity.Program;
+import org.itmo.isLab1.programs.entity.Program;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

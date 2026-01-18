@@ -1,9 +1,8 @@
-package org.itmo.isLab1.common.programs.dto;
+package org.itmo.isLab1.programs.dto;
 
 import java.time.LocalDate;
 import java.util.Map;
 
-import org.openapitools.jackson.nullable.JsonNullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -18,35 +17,33 @@ import lombok.AllArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProgramUpdateDto {
+public class ProgramCreateDto {
     @NotBlank(message = "Название не может быть пустым")
     @Size(max = 255, message = "Название должно содержать максимум 255 символов")
-    private JsonNullable<String> title;
+    private String title;
 
     @Size(max = 5000)
-    private JsonNullable<String> description;
+    private String description;
 
-    private JsonNullable<Map<String, Object>> goals;
+    private Map<String, Object> goals;
 
-    private JsonNullable<Map<String, Object>> conditions;
+    private Map<String, Object> conditions;
 
     @NotNull(message = "Дедлайн подачи не может быть пустым")
-    private JsonNullable<LocalDate> deadlineApply;
+    private LocalDate deadlineApply;
 
     @NotNull(message = "Дедлайн ревью не может быть пустым")
-    private JsonNullable<LocalDate> deadlineReview;
+    private LocalDate deadlineReview;
 
     @NotNull(message = "Дедлайн уведомления не может быть пустым")
-    private JsonNullable<LocalDate> deadlineNotify;
+    private LocalDate deadlineNotify;
 
     @PositiveOrZero(message = "Длительность должна быть неотрицательным числом")
-    private JsonNullable<Integer> durationDays;
+    private Integer durationDays;
 
     @PositiveOrZero(message = "Бюджет должен быть неотрицательным числом")
-    private JsonNullable<Integer> budgetQuota;
+    private Integer budgetQuota;
 
     @PositiveOrZero(message = "Квота участников должна быть неотрицательным числом")
-    private JsonNullable<Integer> peopleQuota;
-
-    private JsonNullable<Boolean> isPublished;
+    private Integer peopleQuota;
 }

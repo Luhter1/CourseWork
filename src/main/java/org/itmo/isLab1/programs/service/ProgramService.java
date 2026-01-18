@@ -1,15 +1,15 @@
-package org.itmo.isLab1.common.programs.service;
+package org.itmo.isLab1.programs.service;
 
 import lombok.RequiredArgsConstructor;
 
 import org.itmo.isLab1.common.errors.PolicyViolationError;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
-import org.itmo.isLab1.common.programs.dto.ProgramDto;
-import org.itmo.isLab1.common.programs.dto.ProgramPreviewDto;
-import org.itmo.isLab1.common.programs.entity.Program;
-import org.itmo.isLab1.common.programs.mapper.ProgramMapper;
-import org.itmo.isLab1.common.programs.repository.ProgramRepository;
-import org.itmo.isLab1.common.programs.repository.ProgramStatsRepository;
+import org.itmo.isLab1.programs.dto.ProgramDto;
+import org.itmo.isLab1.programs.dto.ProgramPreviewDto;
+import org.itmo.isLab1.programs.entity.Program;
+import org.itmo.isLab1.programs.mapper.ProgramMapper;
+import org.itmo.isLab1.programs.repository.ProgramRepository;
+import org.itmo.isLab1.programs.repository.ProgramStatsRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
