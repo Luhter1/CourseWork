@@ -3,9 +3,11 @@ package org.itmo.isLab1.experts.service;
 import lombok.RequiredArgsConstructor;
 
 import org.itmo.isLab1.experts.dto.ExpertDto;
+import org.itmo.isLab1.experts.repository.ExpertRepository;
 import org.itmo.isLab1.users.Role;
 import org.itmo.isLab1.users.User;
 import org.itmo.isLab1.users.UserRepository;
+import org.itmo.isLab1.users.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ExpertService {
     
     private final UserRepository userRepository;
+    private final UserService userService;
+    private final ExpertRepository expertRepository;
 
     @Transactional(readOnly = true)
     public Page<ExpertDto> getExpertsProfile(Pageable pageable) {
@@ -29,5 +33,11 @@ public class ExpertService {
                 profile.getSurname()
             );
         });
+    }
+
+    @Transactional
+    public void setExpertToProgram(Long expertId, Long programId) {
+        User currentUser = userService.getCurrentUser();
+        expertRepository.assignExpertToProgram(programId, expertId, currentUser.getId());
     }
 }
