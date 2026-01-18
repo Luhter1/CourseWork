@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.itmo.isLab1.programs.dto.ProgramPreviewDto;
 
 import java.time.ZonedDateTime;
 
@@ -16,8 +15,6 @@ import java.time.ZonedDateTime;
 public class ReviewDto {
 
     private Long id;
-
-    private ProgramPreviewDto program;
 
     private String artistName;
 

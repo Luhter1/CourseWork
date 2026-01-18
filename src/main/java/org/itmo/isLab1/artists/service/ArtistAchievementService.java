@@ -15,11 +15,10 @@ import org.itmo.isLab1.common.errors.PolicyViolationError;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
 import org.itmo.isLab1.users.User;
 import org.itmo.isLab1.users.UserRepository;
+import org.itmo.isLab1.users.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,13 +29,13 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class ArtistAchievementService {
 
     private final AchievementRepository achievementRepository;
     private final ArtistProfileRepository artistDetailsRepository;
     private final AchievementMapper achievementMapper;
     private final UserRepository userRepository;
+    private final UserService userService;
 
     /**
      * Получает все достижения художника
@@ -45,6 +44,7 @@ public class ArtistAchievementService {
      * @return список достижений в виде DTO
      * @throws ResourceNotFoundException если художник с указанным ID не найден
      */
+    @Transactional(readOnly = true)
     public Page<AchievementDto> getArtistAchievements(Long userId, Pageable pageable) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь с id " + userId + " не найден"));
@@ -63,6 +63,7 @@ public class ArtistAchievementService {
      * @return список достижений в виде DTO
      * @throws ResourceNotFoundException если художник с указанным ID не найден
      */
+    @Transactional(readOnly = true)
     public Page<AchievementDto> getCurrentArtistAchievements(Pageable pageable) {
         Long artistId = getCurrentArtistId();
 
@@ -169,11 +170,7 @@ public class ArtistAchievementService {
      * @throws ResourceNotFoundException если профиль художника не найден
      */
     private Long getCurrentArtistId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // Извлекаем текущего пользователя из SecurityContextHolder.getContext().getAuthentication().getPrincipal()
-        String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с username " + username + " не найден"));
+        User user = userService.getCurrentUser();
 
         // Находим связанный ArtistDetails
         ArtistProfile artistDetails = artistDetailsRepository.findByUser(user)
