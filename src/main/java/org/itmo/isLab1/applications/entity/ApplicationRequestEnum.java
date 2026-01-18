@@ -1,4 +1,4 @@
-package org.itmo.isLab1.common.applications.entity;
+package org.itmo.isLab1.applications.entity;
 
 public enum ApplicationRequestEnum {
     SENT, 

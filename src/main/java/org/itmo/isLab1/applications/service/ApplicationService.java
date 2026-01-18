@@ -1,11 +1,10 @@
-package org.itmo.isLab1.common.applications.service;
+package org.itmo.isLab1.applications.service;
 
 import lombok.RequiredArgsConstructor;
 
-import org.itmo.isLab1.artists.service.ArtistService;
-import org.itmo.isLab1.common.applications.dto.ArtistApplicationDto;
-import org.itmo.isLab1.common.applications.entity.ArtistApplication;
-import org.itmo.isLab1.common.applications.repository.ArtistApplicationRequestRepository;
+import org.itmo.isLab1.applications.dto.ApplicationDto;
+import org.itmo.isLab1.applications.mapper.ApplicationMapper;
+import org.itmo.isLab1.applications.repository.ApplicationRepository;
 import org.itmo.isLab1.users.User;
 import org.itmo.isLab1.users.UserRepository;
 import org.springframework.data.domain.Page;
@@ -17,27 +16,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ArtistApplicationService {
+public class ApplicationService {
 
-    private final ArtistApplicationRequestRepository applicationRepository;
+    private final ApplicationRepository applicationRepository;
     private final UserRepository userRepository;
+    private final ApplicationMapper applicationMapper;
 
-    public Page<ArtistApplicationDto> getMyApplications(Pageable pageable) {
+    public Page<ApplicationDto> getMyApplications(Pageable pageable) {
         User currentUser = getCurrentUser();
 
         return applicationRepository.findAllByArtist(currentUser, pageable)
-                .map(this::toDto);
-    }
-
-    //TODO: маппер
-    private ArtistApplicationDto toDto(ArtistApplication request) {
-        ArtistApplicationDto dto = new ArtistApplicationDto();
-        dto.setId(request.getId());
-        dto.setProgramId(request.getProgramId());
-        dto.setStatus(request.getStatus().name()); // enum -> string
-        dto.setSubmittedAt(request.getSubmittedAt());
-        dto.setCreatedAt(request.getCreatedAt());
-        return dto;
+                .map(applicationMapper::toApplicationDto);
     }
 
     /**

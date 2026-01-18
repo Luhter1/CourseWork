@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.itmo.isLab1.artists.dto.ArtistProfileDto;
 import org.itmo.isLab1.artists.dto.ArtistProfileUpdateDto;
+import org.itmo.isLab1.applications.dto.ApplicationDto;
+import org.itmo.isLab1.applications.service.ApplicationService;
 import org.itmo.isLab1.artists.dto.ArtistProfileCreateDto;
 import org.itmo.isLab1.artists.service.ArtistService;
 import org.itmo.isLab1.notifications.dto.NotificationCreateDto;
@@ -33,7 +35,7 @@ public class ArtistController {
 
     private final ArtistService artistService;
     private final NotificationService notificationService;
-    // private final ArtistApplicationService artistApplicationService;
+    private final ApplicationService applicationService;
     private final UserRepository userRepository;
 
     /**
@@ -114,14 +116,14 @@ public class ArtistController {
         return ResponseEntity.status(HttpStatus.CREATED).body(notificationId);
     }
 
-    // @GetMapping("/me/applications")
-    // @PreAuthorize("hasRole('ARTIST')")
-    // public ResponseEntity<Page<ArtistApplicationDto>> getMyApplications(
-    //         @PageableDefault(size = 20, sort = "submittedAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    @GetMapping("/me/applications")
+    @PreAuthorize("hasRole('ARTIST')")
+    public ResponseEntity<Page<ApplicationDto>> getMyApplications(
+            @PageableDefault(size = 20, sort = "submittedAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-    //     Page<ArtistApplicationDto> page = artistApplicationService.getMyApplications(pageable);
-    //     return ResponseEntity.ok(page);
-    // }
+        Page<ApplicationDto> page = applicationService.getMyApplications(pageable);
+        return ResponseEntity.ok(page);
+    }
 
     /**
      * Вспомогательный метод для получения текущего пользователя из контекста безопасности

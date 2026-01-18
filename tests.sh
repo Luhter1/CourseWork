@@ -1,6 +1,6 @@
 # Сервер запущен на порту 15123.
 # В БД существуют тестовые данные: пользователь-художник с id=1 (username=artist1, роль ARTIST), ArtistDetails с id=1, достижения с id=1 (title="Test Achievement").
-# ARTIST_TOKEN: валидный JWT для artist1 (получить: curl -X POST http://localhost:15123/api/auth/signin -H "Content-Type: application/json" -d '{"username":"artist1","password":"pass"}' → извлечь accessToken).
+# ROLE_ARTIST: валидный JWT для artist1 (получить: curl -X POST http://localhost:15123/api/auth/signin -H "Content-Type: application/json" -d '{"username":"artist1","password":"pass"}' → извлечь accessToken).
 # USER_TOKEN: JWT для обычного пользователя (роль USER).
 # INVALID_TOKEN: неверный токен, напр. eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.invalid.
 # Пагинация по умолчанию: size=20, sort=id,asc.
@@ -27,19 +27,21 @@ curl -i -X POST http://localhost:15123/api/auth/login \
       }'
 
 curl -X POST "http://localhost:15123/api/artists/me" \
-  -H "Authorization: Bearer $ARTIST_TOKEN" \
+  -H "Authorization: Bearer $ROLE_ARTIST" \
   -H "Content-Type: application/json" \
   -d '{
         "biography": "test_user@mail.ru",
         "location": "mySecurePassword"
       }'
 
-curl -X GET "http://localhost:15123/api/artists/me" -H "Authorization: Bearer $ARTIST_TOKEN"
+curl -X GET "http://localhost:15123/api/artists/me" -H "Authorization: Bearer $ROLE_ARTIST"
+
+curl -X GET "http://localhost:15123/api/artists/me/applications" -H "Authorization: Bearer $ROLE_ARTIST"
 
 curl -X GET "http://localhost:15123/api/artists/1"
 
 curl -X PUT "http://localhost:15123/api/artists/me" \
-  -H "Authorization: Bearer $ARTIST_TOKEN" \
+  -H "Authorization: Bearer $ROLE_ARTIST" \
   -H "Content-Type: application/json" \
   -d '{
         "biography": null,
@@ -62,7 +64,7 @@ curl -X GET "http://localhost:15123/api/artists/1/achievements?page=1&size=10&so
 
 # Позитивный: Получение своих достижений.
 curl -X GET "http://localhost:15123/api/artists/me/achievements" \
-  -H "Authorization: Bearer $ARTIST_TOKEN" -v
+  -H "Authorization: Bearer $ROLE_ARTIST" -v
 
 # Негативный: Без токена.
 curl -X GET "http://localhost:15123/api/artists/me/achievements" -v
@@ -73,7 +75,7 @@ curl -X GET "http://localhost:15123/api/artists/me/achievements" \
 
 # Позитивный: Создание достижения.
 curl -X POST "http://localhost:15123/api/artists/me/achievements" \
-  -H "Authorization: Bearer $ARTIST_TOKEN" \
+  -H "Authorization: Bearer $ROLE_ARTIST" \
   -H "Content-Type: application/json" \
   -d '{
     "type": "EDUCATION",
@@ -84,13 +86,13 @@ curl -X POST "http://localhost:15123/api/artists/me/achievements" \
 
 # Негативный: Валидация (пустой title).
 curl -X POST "http://localhost:15123/api/artists/me/achievements" \
-  -H "Authorization: Bearer $ARTIST_TOKEN" \
+  -H "Authorization: Bearer $ROLE_ARTIST" \
   -H "Content-Type: application/json" \
   -d '{"type": "EXHIBITION", "title": "", "description": "desc"}' -v
 
 # Негативный: Неверный URL.
 curl -X POST "http://localhost:15123/api/artists/me/achievements" \
-  -H "Authorization: Bearer $ARTIST_TOKEN" \
+  -H "Authorization: Bearer $ROLE_ARTIST" \
   -H "Content-Type: application/json" \
   -d '{"type": "EXHIBITION", "title": "Test", "link": "invalid-url"}' -v
 
@@ -102,7 +104,7 @@ curl -X POST "http://localhost:15123/api/artists/me/achievements" \
 
 # Позитивный: Обновление.
 curl -X PUT "http://localhost:15123/api/artists/me/achievements/1" \
-  -H "Authorization: Bearer $ARTIST_TOKEN" \
+  -H "Authorization: Bearer $ROLE_ARTIST" \
   -H "Content-Type: application/json" \
   -d '{
     "title": "null",
@@ -112,29 +114,29 @@ curl -X PUT "http://localhost:15123/api/artists/me/achievements/1" \
 
 # Негативный: Несуществующий achievement ID.
 curl -X PUT "http://localhost:15123/api/artists/me/achievements/999" \
-  -H "Authorization: Bearer $ARTIST_TOKEN" -v
+  -H "Authorization: Bearer $ROLE_ARTIST" -v
 
 # Негативный: Валидация title слишком длинный.
 curl -X PUT "http://localhost:15123/api/artists/me/achievements/1" \
-  -H "Authorization: Bearer $ARTIST_TOKEN" \
+  -H "Authorization: Bearer $ROLE_ARTIST" \
   -H "Content-Type: application/json" \
   -d '{"title": "'$(printf 'A%.0s' {1..300})'"}' -v
 
 # Позитивный: Удаление.
 curl -X DELETE "http://localhost:15123/api/artists/me/achievements/1" \
-  -H "Authorization: Bearer $ARTIST_TOKEN" -v
+  -H "Authorization: Bearer $ROLE_ARTIST" -v
 
 # Негативный: Несуществующий ID.
 curl -X DELETE "http://localhost:15123/api/artists/me/achievements/999" \
-  -H "Authorization: Bearer $ARTIST_TOKEN" -v
+  -H "Authorization: Bearer $ROLE_ARTIST" -v
 
 # Позитивный: Получение своего профиля.
 curl -X GET "http://localhost:15123/api/artists/me" \
-  -H "Authorization: Bearer $ARTIST_TOKEN" -v
+  -H "Authorization: Bearer $ROLE_ARTIST" -v
 
 # Позитивный: Обновление профиля.
 curl -X PUT "http://localhost:15123/api/artists/me" \
-  -H "Authorization: Bearer $ARTIST_TOKEN" \
+  -H "Authorization: Bearer $ROLE_ARTIST" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "New Name",
@@ -147,24 +149,24 @@ curl -X PUT "http://localhost:15123/api/artists/me" \
 curl -X GET "http://localhost:15123/api/artists/2/works" -v
 
 curl -X GET "http://localhost:15123/api/artists/me/works" \
-  -H "Authorization: Bearer $ARTIST_TOKEN" -v
+  -H "Authorization: Bearer $ROLE_ARTIST" -v
 
 curl -X GET "http://localhost:15123/api/artists/me/works" \
   -H "Authorization: Bearer $SUPERADMIN_TOKER" -v
 
 curl -X POST "http://localhost:15123/api/artists/me/works" \
-  -H "Authorization: Bearer $ARTIST_TOKEN" \
+  -H "Authorization: Bearer $ROLE_ARTIST" \
   -H "Content-Type: application/json" \
   -d '{"title": "EXHIBITION", "description": "123213", "artDirection": "PAINTING", "date": "2007-12-03", "link": "https://example.com/new"}' -v
 
 curl -X PUT "http://localhost:15123/api/artists/me/works/1" \
-  -H "Authorization: Bearer $ARTIST_TOKEN" \
+  -H "Authorization: Bearer $ROLE_ARTIST" \
   -H "Content-Type: application/json" \
   -d '{"date": "2020-12-03", "link": null}' -v
 
 # файлы
 curl -X POST "http://localhost:15123/api/artists/me/works/1/media" \
-  -H "Authorization: Bearer $ARTIST_TOKEN" \
+  -H "Authorization: Bearer $ROLE_ARTIST" \
   -H "Content-Type: multipart/form-data" \
   -F "files=@component_diagram.drawio.png"
 
