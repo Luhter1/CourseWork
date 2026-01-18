@@ -16,12 +16,9 @@ import org.itmo.isLab1.programs.repository.ProgramStatsRepository;
 import org.itmo.isLab1.residences.entity.ResidenceDetails;
 import org.itmo.isLab1.residences.repository.ResidenceDetailsRepository;
 import org.itmo.isLab1.users.User;
-import org.itmo.isLab1.users.UserRepository;
+import org.itmo.isLab1.users.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +32,7 @@ public class ResidenceProgramService {
     private final ObjectMapper objectMapper;
     private final ProgramRepository residenceProgramRepository;
     private final ProgramMapper residenceProgramMapper;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final ResidenceDetailsRepository residenceDetailsRepository;
     private final ProgramStatsRepository residenceProgramStatsRepository;
 
@@ -50,7 +47,7 @@ public class ResidenceProgramService {
     @Transactional(readOnly = true)
     public Page<ProgramPreviewDto> getProgramsByResidenceId(Pageable pageable) {
 
-        User currentUser = getCurrentUser();
+        User currentUser = userService.getCurrentUser();
         ResidenceDetails residence = residenceDetailsRepository.findByUserId(currentUser.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("У вас нет резиденции"));
 
@@ -70,7 +67,7 @@ public class ResidenceProgramService {
     @Transactional(readOnly = true)
     public ProgramDto getProgramById(Long programId) {
 
-        User currentUser = getCurrentUser();
+        User currentUser = userService.getCurrentUser();
         ResidenceDetails residence = residenceDetailsRepository.findByUserId(currentUser.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("У вас нет резиденции"));
 
@@ -85,7 +82,7 @@ public class ResidenceProgramService {
     @Transactional
     public ProgramDto publishProgram(Long programId) {
 
-        User currentUser = getCurrentUser();
+        User currentUser = userService.getCurrentUser();
         ResidenceDetails residence = residenceDetailsRepository.findByUserId(currentUser.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("У вас нет резиденции"));
 
@@ -103,7 +100,7 @@ public class ResidenceProgramService {
     @Transactional
     public ProgramDto unpublishProgram(Long programId) {
 
-        User currentUser = getCurrentUser();
+        User currentUser = userService.getCurrentUser();
         ResidenceDetails residence = residenceDetailsRepository.findByUserId(currentUser.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("У вас нет резиденции"));
 
@@ -130,7 +127,7 @@ public class ResidenceProgramService {
     @Transactional
     public ProgramDto updateProgram(Long programId, ProgramUpdateDto updateDto) {
 
-        User currentUser = getCurrentUser();
+        User currentUser = userService.getCurrentUser();
         ResidenceDetails residence = residenceDetailsRepository.findByUserId(currentUser.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("У вас нет резиденции"));
 
@@ -157,7 +154,7 @@ public class ResidenceProgramService {
     @Transactional
     public ProgramDto createProgram(ProgramCreateDto createDto) {
 
-        User currentUser = getCurrentUser();
+        User currentUser = userService.getCurrentUser();
         ResidenceDetails residence = residenceDetailsRepository.findByUserId(currentUser.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("У вас нет резиденции"));
 
@@ -204,7 +201,7 @@ public class ResidenceProgramService {
     @Transactional
     public ProgramStatsDto getProgramStatsById(Long programId) {
 
-        User currentUser = getCurrentUser();
+        User currentUser = userService.getCurrentUser();
         ResidenceDetails residence = residenceDetailsRepository.findByUserId(currentUser.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("У вас нет резиденции"));
 
@@ -216,13 +213,4 @@ public class ResidenceProgramService {
         return residenceProgramMapper.toStatDto(programStats);
     }
 
-    private User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // Извлекаем текущего пользователя из SecurityContextHolder.getContext().getAuthentication().getPrincipal()
-        String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с username " + username + " не найден"));
-
-        return user;
-    }
 }

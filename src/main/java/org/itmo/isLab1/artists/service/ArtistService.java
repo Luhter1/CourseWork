@@ -12,10 +12,9 @@ import org.itmo.isLab1.common.errors.EntityDuplicateException;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
 import org.itmo.isLab1.users.User;
 import org.itmo.isLab1.users.UserRepository;
+import org.itmo.isLab1.users.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ArtistService {
 
     private final UserRepository userRepository;
+    private final UserService userService;
     private final ArtistProfileRepository artistDetailsRepository;
     private final ArtistMapper artistMapper;
 
@@ -77,7 +77,7 @@ public class ArtistService {
      */
     @Transactional
     public ArtistProfileDto createArtistProfile(ArtistProfileCreateDto request) {
-        User user = getCurrentUser();
+        User user = userService.getCurrentUser();
 
         // Проверяем, что профиль еще не существует
         if (artistDetailsRepository.findByUser(user).isPresent()) {
@@ -103,7 +103,7 @@ public class ArtistService {
      */
     @Transactional
     public ArtistProfileDto updateArtistProfile(ArtistProfileUpdateDto request) {
-        User user = getCurrentUser();
+        User user = userService.getCurrentUser();
         
         // Находим существующий ArtistDetails
         ArtistProfile details = artistDetailsRepository.findByUser(user)
@@ -123,21 +123,5 @@ public class ArtistService {
         
         // Возвращаем обновленный профиль
         return artistMapper.toProfileResponse(user, savedDetails);
-    }
-
-    /**
-     * Вспомогательный метод для получения текущего пользователя из контекста безопасности
-     *
-     * @return ID пользователя
-     * @throws UsernameNotFoundException если пользователь не найден
-     */
-    private User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // Извлекаем текущего пользователя из SecurityContextHolder.getContext().getAuthentication().getPrincipal()
-        String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с username " + username + " не найден"));
-
-        return user;
     }
 }

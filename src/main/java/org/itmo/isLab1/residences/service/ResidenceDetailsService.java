@@ -13,12 +13,9 @@ import org.itmo.isLab1.residences.repository.ResidenceDetailsRepository;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
 import org.itmo.isLab1.common.errors.PolicyViolationError;
 import org.itmo.isLab1.users.User;
-import org.itmo.isLab1.users.UserRepository;
+import org.itmo.isLab1.users.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +27,7 @@ public class ResidenceDetailsService {
     private final ResidenceDetailsRepository repository;
     private final ResidenceDetailsMapper mapper;
     private final ObjectMapper objectMapper;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     /**
      * Создание профиля резиденции
@@ -40,7 +37,7 @@ public class ResidenceDetailsService {
      */
     @Transactional
     public ResidenceDetailsDto create(ResidenceDetailsCreateDto dto) {
-        Long userId = getCurrentUser().getId();
+        Long userId = userService.getCurrentUser().getId();
 
         String contactsJson;
         try {
@@ -92,7 +89,7 @@ public class ResidenceDetailsService {
      * @return профиль резиденции
      */
     public ResidenceDetailsDto getMyProfile() {
-        User user = getCurrentUser();
+        User user = userService.getCurrentUser();
         ResidenceDetails details = repository.findByUserId(user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Профиль резиденции не найден"));
         return mapper.toResidenceDetailsWithValidation(details);
@@ -132,7 +129,7 @@ public class ResidenceDetailsService {
      * @return статус валидации с комментарием и датой отправки
      */
     public ValidationResponseDto getMyValidationStatus() {
-        User user = getCurrentUser();
+        User user = userService.getCurrentUser();
         ResidenceDetails details = repository.findByUserId(user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Профиль резиденции не найден"));
         
@@ -143,17 +140,4 @@ public class ResidenceDetailsService {
                 .build();
     }
 
-    /**
-     * Вспомогательный метод для получения текущего пользователя из контекста безопасности
-     *
-     * @return пользователь
-     * @throws UsernameNotFoundException если пользователь не найден
-     */
-    private User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с username " + username + " не найден"));
-        return user;
-    }
 }

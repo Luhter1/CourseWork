@@ -10,11 +10,7 @@ import org.itmo.isLab1.artists.dto.ArtistProfileCreateDto;
 import org.itmo.isLab1.artists.service.ArtistService;
 import org.itmo.isLab1.notifications.dto.NotificationCreateDto;
 import org.itmo.isLab1.notifications.service.NotificationService;
-import org.itmo.isLab1.users.User;
-import org.itmo.isLab1.users.UserRepository;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.itmo.isLab1.users.UserService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
@@ -35,7 +31,7 @@ public class ArtistController {
     private final ArtistService artistService;
     private final NotificationService notificationService;
     private final ApplicationService applicationService;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     /**
      * Получение профилей художников
@@ -71,7 +67,7 @@ public class ArtistController {
     @GetMapping("/me")
     @PreAuthorize("hasRole('ARTIST')")
     public ResponseEntity<ArtistProfileDto> getMyProfile() {
-        var user = getCurrentUser();
+        var user = userService.getCurrentUser();
         var obj = artistService.getArtistProfile(user);
 
         return ResponseEntity.ok(obj);
@@ -122,21 +118,5 @@ public class ArtistController {
 
         Page<ApplicationDto> page = applicationService.getMyApplications(pageable);
         return ResponseEntity.ok(page);
-    }
-
-    /**
-     * Вспомогательный метод для получения текущего пользователя из контекста безопасности
-     *
-     * @return ID пользователя
-     * @throws UsernameNotFoundException если пользователь не найден
-     */
-    private User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // Извлекаем текущего пользователя из SecurityContextHolder.getContext().getAuthentication().getPrincipal()
-        String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с username " + username + " не найден"));
-
-        return user;
     }
 }
