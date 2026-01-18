@@ -31,7 +31,7 @@ public class ProgramService {
      */
     @Transactional(readOnly = true)
     public Page<ResidenceProgramPreviewDto> getPrograms(Pageable pageable) {
-        return residenceProgramRepository.findAll(pageable)
+        return residenceProgramRepository.findByIsPublishedTrue(pageable)
             .map(residenceProgramMapper::toPreviewDto);
     }
 
@@ -44,11 +44,17 @@ public class ProgramService {
      * @throws ResourceNotFoundException если программа или резиденция не найдены
      * @throws PolicyViolationError       если пользователь не является владельцем резиденции
      */
-    @Transactional(readOnly = true)
+    @Transactional
     public ResidenceProgramDto getProgramById(Long programId) {
 
         ResidenceProgram program = residenceProgramRepository.findById(programId)
                 .orElseThrow(() -> new ResourceNotFoundException("Программа с id " + programId + " не найдена для резиденции"));
+
+        if (!program.getIsPublished()) {
+            throw new PolicyViolationError("Доступ к программе возможен только если она опубликована");
+        }
+
+        residenceProgramRepository.createProgramViewLog(programId);
         return residenceProgramMapper.toDto(program);
     }
 }

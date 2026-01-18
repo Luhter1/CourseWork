@@ -273,3 +273,6 @@ curl -X GET "http://localhost:15123/api/notifications/1/read" \
 
 curl -X GET "http://localhost:15123/api/notifications/read-all" \
   -H "Authorization: Bearer $TOKEN"
+
+# программы
+curl -X GET http://localhost:15123/api/programs
