@@ -1,4 +1,4 @@
-package org.itmo.isLab1.common.notifications.entity;
+package org.itmo.isLab1.notifications.entity;
 
 public enum NotificationCategory {
     SYSTEM,

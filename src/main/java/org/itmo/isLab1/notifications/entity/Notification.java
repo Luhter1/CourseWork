@@ -1,4 +1,4 @@
-package org.itmo.isLab1.common.notifications.entity;
+package org.itmo.isLab1.notifications.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

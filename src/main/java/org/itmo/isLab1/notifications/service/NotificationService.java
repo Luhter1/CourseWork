@@ -1,13 +1,13 @@
-package org.itmo.isLab1.common.notifications.service;
+package org.itmo.isLab1.notifications.service;
 
 import lombok.RequiredArgsConstructor;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
-import org.itmo.isLab1.common.notifications.dto.NotificationCreateDto;
-import org.itmo.isLab1.common.notifications.dto.NotificationDto;
-import org.itmo.isLab1.common.notifications.entity.Notification;
-import org.itmo.isLab1.common.notifications.mapper.NotificationMapper;
-import org.itmo.isLab1.common.notifications.entity.NotificationCategory;
-import org.itmo.isLab1.common.notifications.repository.NotificationRepository;
+import org.itmo.isLab1.notifications.dto.NotificationCreateDto;
+import org.itmo.isLab1.notifications.dto.NotificationDto;
+import org.itmo.isLab1.notifications.entity.Notification;
+import org.itmo.isLab1.notifications.entity.NotificationCategory;
+import org.itmo.isLab1.notifications.mapper.NotificationMapper;
+import org.itmo.isLab1.notifications.repository.NotificationRepository;
 import org.itmo.isLab1.users.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

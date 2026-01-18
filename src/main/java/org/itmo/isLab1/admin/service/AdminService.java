@@ -1,8 +1,8 @@
 package org.itmo.isLab1.admin.service;
 
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
-import org.itmo.isLab1.common.notifications.entity.NotificationCategory;
-import org.itmo.isLab1.common.notifications.service.NotificationService;
+import org.itmo.isLab1.notifications.entity.NotificationCategory;
+import org.itmo.isLab1.notifications.service.NotificationService;
 import org.itmo.isLab1.residences.dto.ResidenceDetailsDto;
 import org.itmo.isLab1.residences.entity.ResidenceDetails;
 import org.itmo.isLab1.residences.entity.ValidationStatus;

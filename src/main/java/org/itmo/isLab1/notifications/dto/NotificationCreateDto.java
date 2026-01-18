@@ -1,10 +1,10 @@
-package org.itmo.isLab1.common.notifications.dto;
+package org.itmo.isLab1.notifications.dto;
 
 import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.validator.constraints.URL;
-import org.itmo.isLab1.common.notifications.entity.NotificationCategory;
+import org.itmo.isLab1.notifications.entity.NotificationCategory;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;

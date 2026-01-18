@@ -1,8 +1,9 @@
-package org.itmo.isLab1.common.notifications.controller;
+package org.itmo.isLab1.notifications.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.itmo.isLab1.common.notifications.dto.NotificationDto;
-import org.itmo.isLab1.common.notifications.service.NotificationService;
+
+import org.itmo.isLab1.notifications.dto.NotificationDto;
+import org.itmo.isLab1.notifications.service.NotificationService;
 import org.itmo.isLab1.users.User;
 import org.itmo.isLab1.users.UserRepository;
 import org.springframework.data.domain.Page;

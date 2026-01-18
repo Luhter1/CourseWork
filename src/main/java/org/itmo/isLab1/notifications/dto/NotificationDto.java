@@ -1,4 +1,4 @@
-package org.itmo.isLab1.common.notifications.dto;
+package org.itmo.isLab1.notifications.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.ZonedDateTime;
 
-import org.itmo.isLab1.common.notifications.entity.NotificationCategory;
+import org.itmo.isLab1.notifications.entity.NotificationCategory;
 
 @Data
 @Builder

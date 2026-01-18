@@ -1,6 +1,6 @@
-package org.itmo.isLab1.common.notifications.repository;
+package org.itmo.isLab1.notifications.repository;
 
-import org.itmo.isLab1.common.notifications.entity.Notification;
+import org.itmo.isLab1.notifications.entity.Notification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
