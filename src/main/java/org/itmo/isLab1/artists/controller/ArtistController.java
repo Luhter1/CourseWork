@@ -119,4 +119,22 @@ public class ArtistController {
         Page<ApplicationDto> page = applicationService.getMyApplications(pageable);
         return ResponseEntity.ok(page);
     }
+
+    @PostMapping("/me/applications/{id}/confirm")
+    @PreAuthorize("hasRole('ARTIST')")
+    public ResponseEntity<ApplicationDto> confirmMyApplication(
+            @PathVariable Long id) {
+
+        ApplicationDto application = applicationService.confirmMyApplication(id);
+        return ResponseEntity.ok(application);
+    }
+
+    @PostMapping("/me/applications/{id}/decline")
+    @PreAuthorize("hasRole('ARTIST')")
+    public ResponseEntity<ApplicationDto> declineMyApplication(
+            @PathVariable Long id) {
+
+        ApplicationDto application = applicationService.declineMyApplication(id);
+        return ResponseEntity.ok(application);
+    }
 }

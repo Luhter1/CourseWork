@@ -278,3 +278,16 @@ curl -X GET "http://localhost:15123/api/notifications/read-all" \
 
 # программы
 curl -X GET http://localhost:15123/api/programs
+
+# отзывы
+curl -X GET "http://localhost:15123/api/programs/1/reviews"
+
+curl -X POST "http://localhost:15123/api/programs/1/reviews"   -H "Authorization: Bearer $ROLE_ARTIST"   -H "Content-Type: application/json"   -d '{
+        "score": 9,
+        "comment": "111"
+      }'
+
+curl -X PUT "http://localhost:15123/api/programs/1/reviews"   -H "Authorization: Bearer $ROLE_ARTIST"   -H "Content-Type: application/json"   -d '{
+        "score": 9,
+        "comment": "111"
+      }'
