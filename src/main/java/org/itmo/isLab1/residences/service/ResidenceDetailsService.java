@@ -36,8 +36,16 @@ public class ResidenceDetailsService {
     private final UserRepository userRepository;
     private final NotificationService notificationService;
 
+    /**
+     * Создание профиля резиденции
+     *
+     * @param id ID профиля резиденции
+     * @return профиль резиденции
+     */
     @Transactional
-    public ResidenceDetailsDto create(Long userId, ResidenceDetailsCreateDto dto) {
+    public ResidenceDetailsDto create(ResidenceDetailsCreateDto dto) {
+        Long userId = getCurrentUser().getId();
+
         String contactsJson;
         try {
             contactsJson = objectMapper.writeValueAsString(dto.getContacts());
@@ -81,6 +89,12 @@ public class ResidenceDetailsService {
         return e.getMessage() != null ? e.getMessage() : "Неизвестная ошибка базы данных";
     }
 
+    /**
+     * Обновление профиля резиденции по ID
+     *
+     * @param id ID профиля резиденции
+     * @return профиль резиденции
+     */
     @Transactional
     public ResidenceDetailsDto update(Long id, ResidenceDetailsUpdateDto dto) {
         ResidenceDetails details = repository.findById(id)
@@ -136,20 +150,6 @@ public class ResidenceDetailsService {
     public Page<ResidenceDetailsDto> getAllPublished(Pageable pageable) {
         return repository.findByIsPublishedTrue(pageable)
                 .map(mapper::toResidenceDetails);
-    }
-
-    /**
-     * Вспомогательный метод для получения текущего пользователя из контекста безопасности
-     *
-     * @return пользователь
-     * @throws UsernameNotFoundException если пользователь не найден
-     */
-    private User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с username " + username + " не найден"));
-        return user;
     }
 
     /**
@@ -248,5 +248,19 @@ public class ResidenceDetailsService {
                 null
             );
         return mapper.toResidenceDetailsWithValidation(details);
+    }
+
+    /**
+     * Вспомогательный метод для получения текущего пользователя из контекста безопасности
+     *
+     * @return пользователь
+     * @throws UsernameNotFoundException если пользователь не найден
+     */
+    private User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с username " + username + " не найден"));
+        return user;
     }
 }

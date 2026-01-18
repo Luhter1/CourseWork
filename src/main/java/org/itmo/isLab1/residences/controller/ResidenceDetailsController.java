@@ -9,8 +9,6 @@ import org.itmo.isLab1.residences.dto.ResidenceStatsDto;
 import org.itmo.isLab1.residences.dto.ValidationResponseDto;
 import org.itmo.isLab1.residences.service.ResidenceDetailsService;
 import org.itmo.isLab1.residences.service.ResidenceStatsService;
-import org.itmo.isLab1.users.User;
-import org.itmo.isLab1.users.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -18,9 +16,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -32,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 public class ResidenceDetailsController {
 
     private final ResidenceDetailsService residenceDetailsService;
-    private final UserRepository userRepository;
     private final ResidenceStatsService residenceStatsService;
 
     /**
@@ -56,8 +50,7 @@ public class ResidenceDetailsController {
     @PostMapping("/me")
     @PreAuthorize("hasRole('RESIDENCE_ADMIN')")
     public ResponseEntity<ResidenceDetailsDto> createMyProfile(@Valid @RequestBody ResidenceDetailsCreateDto request) {
-        User user = getCurrentUser();
-        ResidenceDetailsDto dto = residenceDetailsService.create(user.getId(), request);
+        ResidenceDetailsDto dto = residenceDetailsService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
@@ -122,19 +115,5 @@ public class ResidenceDetailsController {
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<ResidenceDetailsDto> page = residenceDetailsService.getAllPublished(pageable);
         return ResponseEntity.ok(page);
-    }
-
-    /**
-     * Вспомогательный метод для получения текущего пользователя из контекста безопасности
-     *
-     * @return пользователь
-     * @throws UsernameNotFoundException если пользователь не найден
-     */
-    private User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с username " + username + " не найден"));
-        return user;
     }
 }
