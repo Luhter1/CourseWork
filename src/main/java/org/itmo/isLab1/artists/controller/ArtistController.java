@@ -10,7 +10,6 @@ import org.itmo.isLab1.artists.dto.ArtistProfileCreateDto;
 import org.itmo.isLab1.artists.service.ArtistService;
 import org.itmo.isLab1.notifications.dto.NotificationCreateDto;
 import org.itmo.isLab1.notifications.service.NotificationService;
-// import org.itmo.isLab1.common.applications.service.ArtistApplicationService;
 import org.itmo.isLab1.users.User;
 import org.itmo.isLab1.users.UserRepository;
 import org.springframework.security.core.Authentication;

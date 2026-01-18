@@ -136,6 +136,7 @@ CREATE TABLE art2art_application_requests (
     -- TODO: возможно надо добавить ограничение на добавление только с ролью ROLE_ARTIST
     -- если художник участвовал в программе, его нельзя удалять
     artist_id        BIGINT NOT NULL REFERENCES art2art_users(id) ON DELETE RESTRICT,
+    motivation       TEXT NOT NULL,
     status           art2art_application_request_status NOT NULL,
     submitted_at     TIMESTAMP DEFAULT now(),
     created_at       TIMESTAMP DEFAULT now(),

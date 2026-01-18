@@ -72,7 +72,8 @@ public class SecurityConfiguration {
 
                 // Публичный доступ к просмотру artists (GET /{id}/achievements)
                 request.requestMatchers(HttpMethod.GET, "/api/artists/**").permitAll();
-                request.requestMatchers(HttpMethod.GET, "/api/programs/**").permitAll();
+                request.requestMatchers(HttpMethod.GET, "/api/programs/**").permitAll()
+                       .requestMatchers(HttpMethod.POST, "/api/programs/**").hasRole("ARTIST");
 
                 // Операции с /me только для ARTIST
                 request.requestMatchers(HttpMethod.POST, "/api/artists/me/**").hasRole("ARTIST")

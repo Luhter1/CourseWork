@@ -52,7 +52,12 @@ public class UserService {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 
-    // Получение текущего пользователя из контекста Spring Security
+    /**
+     * Вспомогательный метод для получения текущего пользователя из контекста безопасности
+     *
+     * @return ID пользователя
+     * @throws UsernameNotFoundException если пользователь не найден
+     */
     public User getCurrentUser() {
         var username = getCurrentUsername();
         return getByUsername(username);

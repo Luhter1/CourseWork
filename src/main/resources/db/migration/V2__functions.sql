@@ -16,11 +16,11 @@ BEGIN
     -- Находим пользователя по email
     SELECT id INTO v_user_id
     FROM art2art_users
-    WHERE email = p_email AND role = 'ROLE_ARTIST'
+    WHERE email = p_email
     LIMIT 1;
 
     IF v_user_id IS NULL THEN
-        RAISE EXCEPTION 'Художник с email "%" не найден', p_email;
+        RAISE EXCEPTION 'Пользователь с email "%" не найден', p_email;
     END IF;
 
     -- Создаем уведомление
@@ -29,29 +29,6 @@ BEGIN
     RETURNING id INTO v_id;
     
     RETURN v_id;
-END;
-$$;
-
-----------------------------------------------------------------------
--- помечаем уведомление как прочитанное
-----------------------------------------------------------------------
-CREATE OR REPLACE FUNCTION mark_notification_read(
-    p_notification_id BIGINT,
-    p_user_id BIGINT
-) RETURNS VOID
-LANGUAGE plpgsql
-AS $$
-DECLARE
-    v_row art2art_notifications%ROWTYPE;
-BEGIN
-    SELECT * INTO v_row FROM art2art_notifications WHERE id = p_notification_id;
-    IF NOT FOUND THEN
-        RAISE EXCEPTION 'Notification % not found', p_notification_id;
-    END IF;
-    IF v_row.user_id <> p_user_id THEN
-        RAISE EXCEPTION 'User % not owner of notification %', p_user_id, p_notification_id;
-    END IF;
-    UPDATE art2art_notifications SET read_at = now() WHERE id = p_notification_id;
 END;
 $$;
 
@@ -153,7 +130,7 @@ $$;
 CREATE OR REPLACE FUNCTION submit_application(
     p_artist_user_id BIGINT,
     p_program_id BIGINT,
-    p_motivation TEXT DEFAULT NULL
+    p_motivation TEXT
 ) RETURNS BIGINT
 LANGUAGE plpgsql
 AS $$
@@ -189,17 +166,9 @@ BEGIN
     END IF;
 
     -- вставляем заявку
-    INSERT INTO art2art_application_requests (program_id, artist_id, status, submitted_at, created_at)
-    VALUES (p_program_id, p_artist_user_id, p_motivation, 'sent', now(), now())
+    INSERT INTO art2art_application_requests (program_id, artist_id, motivation, status, submitted_at, created_at)
+    VALUES (p_program_id, p_artist_user_id, p_motivation, 'SENT', now(), now())
     RETURNING id INTO v_application_id;
-
-    -- уведомляем админа резиденции (на уровне бизнес логики будет использоваться ws для показания того, что появилось новое сообщение)
-    PERFORM create_notification(
-        (SELECT rd.user_id FROM art2art_residence_details rd JOIN art2art_programs p ON p.residence_id = rd.id WHERE p.id = p_program_id LIMIT 1),
-        format('New application %s from artist %s', v_application_id, p_artist_user_id),
-        'REVIEW',
-        NULL
-    );
 
     RETURN v_application_id;
 END;

@@ -8,6 +8,8 @@ import org.itmo.isLab1.notifications.entity.Notification;
 import org.itmo.isLab1.notifications.entity.NotificationCategory;
 import org.itmo.isLab1.notifications.mapper.NotificationMapper;
 import org.itmo.isLab1.notifications.repository.NotificationRepository;
+import org.itmo.isLab1.users.Role;
+import org.itmo.isLab1.users.User;
 import org.itmo.isLab1.users.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,9 +33,13 @@ public class NotificationService {
     @Transactional
     public Long sendInviteNotification(NotificationCreateDto dto) {
         // Проверяем, что пользователь существует
-        userRepository.findByUsername(dto.getEmail())
+        User user = userRepository.findByUsername(dto.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("Пользователь с email " + dto.getEmail() + " не найден"));
 
+        if(user.getRole() != Role.ROLE_ARTIST){
+            throw new ResourceNotFoundException("Художник с email " + dto.getEmail() + " не найден");
+        }
+        
         Long notificationId = notificationRepository.createNotification(
                 dto.getEmail(),
                 dto.getMessage(),

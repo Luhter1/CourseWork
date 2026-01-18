@@ -2,6 +2,8 @@ package org.itmo.isLab1.programs.service;
 
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDate;
+
 import org.itmo.isLab1.common.errors.PolicyViolationError;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
 import org.itmo.isLab1.programs.dto.ProgramDto;
@@ -33,7 +35,7 @@ public class ProgramService {
      */
     @Transactional(readOnly = true)
     public Page<ProgramPreviewDto> getPrograms(Pageable pageable) {
-        return residenceProgramRepository.findByIsPublishedTrue(pageable)
+        return residenceProgramRepository.findByIsPublishedTrueAndDeadlineApplyGreaterThanEqual(LocalDate.now(), pageable)
             .map(residenceProgramMapper::toPreviewDto);
     }
 

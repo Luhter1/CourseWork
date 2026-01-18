@@ -22,6 +22,8 @@ public interface ProgramRepository extends JpaRepository<Program, Long> {
 
     Page<Program> findByIsPublishedTrue(Pageable pageable);
 
+    Page<Program> findByIsPublishedTrueAndDeadlineApplyGreaterThanEqual(LocalDate date, Pageable pageable);
+
     @Query(
         value = """
             select create_program(

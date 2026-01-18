@@ -37,6 +37,9 @@ public class Application implements BaseEntity {
     @JoinColumn(name = "artist_id", nullable = false)
     private User artist;
 
+    @Column(name = "motivation", nullable = false, columnDefinition = "TEXT")
+    private String motivation;   
+
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(name = "status", nullable = false)

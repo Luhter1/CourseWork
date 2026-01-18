@@ -1,19 +1,16 @@
 package org.itmo.isLab1.applications.dto;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import org.itmo.isLab1.applications.entity.ApplicationRequestEnum;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApplicationDto {
-    private Long id;
-    private Long programId;
-    private Long userId;
+public class ApplicationCreateDto {
+    @NotNull(message = "Motivation is required")
     private String motivation;
-    private ApplicationRequestEnum status;
 }
