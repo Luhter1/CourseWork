@@ -5,10 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.itmo.isLab1.residences.dto.ResidenceDetailsCreateDto;
 import org.itmo.isLab1.residences.dto.ResidenceDetailsDto;
 import org.itmo.isLab1.residences.dto.ResidenceDetailsUpdateDto;
-import org.itmo.isLab1.residences.dto.ResidenceStatsDto;
 import org.itmo.isLab1.residences.dto.ValidationResponseDto;
 import org.itmo.isLab1.residences.service.ResidenceDetailsService;
-import org.itmo.isLab1.residences.service.ResidenceStatsService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -27,19 +25,6 @@ import org.springframework.web.bind.annotation.*;
 public class ResidenceDetailsController {
 
     private final ResidenceDetailsService residenceDetailsService;
-    private final ResidenceStatsService residenceStatsService;
-
-    /**
-     * Получение статистики резиденции для текущего пользователя
-     *
-     * @return DTO со статистикой резиденции
-     */
-    @GetMapping("/me/stats")
-    @PreAuthorize("hasRole('RESIDENCE_ADMIN')")
-    public ResponseEntity<ResidenceStatsDto> getStatsForCurrentUser() {
-        ResidenceStatsDto dto = residenceStatsService.getStatsForCurrentUser();
-        return ResponseEntity.ok(dto);
-    }
     
     /**
      * Создание профиля резиденции для текущего пользователя
