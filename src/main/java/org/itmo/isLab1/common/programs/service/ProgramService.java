@@ -9,6 +9,7 @@ import org.itmo.isLab1.common.programs.dto.ResidenceProgramPreviewDto;
 import org.itmo.isLab1.common.programs.entity.ResidenceProgram;
 import org.itmo.isLab1.common.programs.mapper.ResidenceProgramMapper;
 import org.itmo.isLab1.common.programs.repository.ResidenceProgramRepository;
+import org.itmo.isLab1.common.programs.repository.ResidenceProgramStatsRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProgramService {
     
     private final ResidenceProgramRepository residenceProgramRepository;
+    private final ResidenceProgramStatsRepository residenceProgramStatsRepository;
     private final ResidenceProgramMapper residenceProgramMapper;
 
     /**
@@ -54,7 +56,7 @@ public class ProgramService {
             throw new PolicyViolationError("Доступ к программе возможен только если она опубликована");
         }
 
-        residenceProgramRepository.createProgramViewLog(programId);
+        residenceProgramStatsRepository.createProgramViewLog(programId);
         return residenceProgramMapper.toDto(program);
     }
 }

@@ -24,18 +24,6 @@ public interface ResidenceProgramRepository extends JpaRepository<ResidenceProgr
 
     @Query(
         value = """
-            select log_residence_view(
-                :programId
-            )
-            """,
-        nativeQuery = true
-    )
-    void createProgramViewLog(
-        @Param("programId") Long programId
-    );
-
-    @Query(
-        value = """
             select create_program(
                 :residenceId, 
                 :title, 

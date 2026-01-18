@@ -3,6 +3,7 @@ package org.itmo.isLab1.residences.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import org.itmo.isLab1.common.programs.dto.ProgramStatsDto;
 import org.itmo.isLab1.common.programs.dto.ResidenceProgramCreateDto;
 import org.itmo.isLab1.common.programs.dto.ResidenceProgramUpdateDto;
 import org.itmo.isLab1.common.programs.dto.ResidenceProgramDto;
@@ -108,5 +109,18 @@ public class ResidenceProgramController {
                 @PathVariable Long id) {
         residenceProgramService.unpublishProgram(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    /**
+     * Возвращает программу по идентификатору
+     *
+     * @param id идентификатор программы
+     * @return программа резиденции
+     */
+    @GetMapping("/{id}/stats")
+    @PreAuthorize("hasRole('RESIDENCE_ADMIN')")
+    public ResponseEntity<ProgramStatsDto> getProgramStats(@PathVariable Long id) {
+        ProgramStatsDto dto = residenceProgramService.getProgramStatsById(id);
+        return ResponseEntity.ok(dto);
     }
 }

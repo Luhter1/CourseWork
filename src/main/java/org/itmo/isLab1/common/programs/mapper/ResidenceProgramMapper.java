@@ -2,10 +2,12 @@ package org.itmo.isLab1.common.programs.mapper;
 
 import org.itmo.isLab1.common.mapper.JsonNullableMapper;
 import org.itmo.isLab1.common.mapper.ReferenceMapper;
+import org.itmo.isLab1.common.programs.dto.ProgramStatsDto;
 import org.itmo.isLab1.common.programs.dto.ResidenceProgramCreateDto;
 import org.itmo.isLab1.common.programs.dto.ResidenceProgramDto;
 import org.itmo.isLab1.common.programs.dto.ResidenceProgramPreviewDto;
 import org.itmo.isLab1.common.programs.dto.ResidenceProgramUpdateDto;
+import org.itmo.isLab1.common.programs.entity.ProgramStats;
 import org.itmo.isLab1.common.programs.entity.ResidenceProgram;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -21,6 +23,8 @@ import org.mapstruct.ReportingPolicy;
     unmappedTargetPolicy = ReportingPolicy.IGNORE
 )
 public interface ResidenceProgramMapper {
+
+    ProgramStatsDto toStatDto(ProgramStats entity);
 
     @Mapping(target = "previewDto", expression = "java(toPreviewDto(entity))")
     ResidenceProgramDto toDto(ResidenceProgram entity);

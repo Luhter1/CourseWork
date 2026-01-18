@@ -3,13 +3,16 @@ package org.itmo.isLab1.residences.service;
 import lombok.RequiredArgsConstructor;
 import org.itmo.isLab1.common.errors.PolicyViolationError;
 import org.itmo.isLab1.common.errors.ResourceNotFoundException;
+import org.itmo.isLab1.common.programs.dto.ProgramStatsDto;
 import org.itmo.isLab1.common.programs.dto.ResidenceProgramCreateDto;
 import org.itmo.isLab1.common.programs.dto.ResidenceProgramUpdateDto;
 import org.itmo.isLab1.common.programs.dto.ResidenceProgramDto;
 import org.itmo.isLab1.common.programs.dto.ResidenceProgramPreviewDto;
+import org.itmo.isLab1.common.programs.entity.ProgramStats;
 import org.itmo.isLab1.common.programs.entity.ResidenceProgram;
 import org.itmo.isLab1.common.programs.mapper.ResidenceProgramMapper;
 import org.itmo.isLab1.common.programs.repository.ResidenceProgramRepository;
+import org.itmo.isLab1.common.programs.repository.ResidenceProgramStatsRepository;
 import org.itmo.isLab1.residences.entity.ResidenceDetails;
 import org.itmo.isLab1.residences.repository.ResidenceDetailsRepository;
 import org.itmo.isLab1.users.User;
@@ -35,6 +38,7 @@ public class ResidenceProgramService {
     private final ResidenceProgramMapper residenceProgramMapper;
     private final UserRepository userRepository;
     private final ResidenceDetailsRepository residenceDetailsRepository;
+    private final ResidenceProgramStatsRepository residenceProgramStatsRepository;
 
     /**
      * Возвращает пагинированный список программ для резиденции текущего пользователя
@@ -215,6 +219,30 @@ public class ResidenceProgramService {
             return message;
         }
         return e.getMessage() != null ? e.getMessage() : "Неизвестная ошибка базы данных";
+    }
+
+    /**
+     * Возвращает статистику программы по идентификатору
+     *
+     * @param residenceId идентификатор резиденции
+     * @param id          идентификатор программы
+     * @return DTO программы
+     * @throws ResourceNotFoundException если программа или резиденция не найдены
+     * @throws PolicyViolationError       если пользователь не является владельцем резиденции
+     */
+    @Transactional
+    public ProgramStatsDto getProgramStatsById(Long programId) {
+
+        User currentUser = getCurrentUser();
+        ResidenceDetails residence = residenceDetailsRepository.findByUserId(currentUser.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("У вас нет резиденции"));
+
+        residenceProgramRepository.findByResidenceIdAndId(residence.getId(), programId)
+                .orElseThrow(() -> new ResourceNotFoundException("У вам нет программы с id " + programId));
+
+        ProgramStats programStats = residenceProgramStatsRepository.findByProgramId(programId)
+            .orElseThrow(() -> new ResourceNotFoundException("Программа с id " + programId + " не найдена для резиденции"));
+        return residenceProgramMapper.toStatDto(programStats);
     }
 
     private User getCurrentUser() {
