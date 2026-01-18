@@ -1,11 +1,12 @@
-package org.itmo.isLab1.residences.controller;
+package org.itmo.isLab1.admin.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.itmo.isLab1.admin.service.AdminService;
 import org.itmo.isLab1.residences.dto.ResidenceDetailsDto;
 import org.itmo.isLab1.residences.dto.ValidationActionDto;
 import org.itmo.isLab1.residences.dto.ValidationResponseDto;
-import org.itmo.isLab1.residences.service.ResidenceDetailsService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -21,9 +22,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/admin/validation-requests")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('SUPERADMIN')")
-public class ValidationRequestController {
+public class AdminController {
 
-    private final ResidenceDetailsService residenceDetailsService;
+    private final AdminService adminService;
 
     /**
      * Получение списка заявок на валидацию с пагинацией
@@ -34,7 +35,7 @@ public class ValidationRequestController {
     @GetMapping
     public ResponseEntity<Page<ResidenceDetailsDto>> getValidationRequests(
             @PageableDefault(size = 20, sort = "validationSubmittedAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<ResidenceDetailsDto> page = residenceDetailsService.getPageOfValidationRequests(pageable);
+        Page<ResidenceDetailsDto> page = adminService.getPageOfValidationRequests(pageable);
         return ResponseEntity.ok(page);
     }
 
@@ -46,7 +47,7 @@ public class ValidationRequestController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<ResidenceDetailsDto> getValidationRequestDetails(@PathVariable Long id) {
-        ResidenceDetailsDto dto = residenceDetailsService.getValidationRequestDetails(id);
+        ResidenceDetailsDto dto = adminService.getValidationRequestDetails(id);
         return ResponseEntity.ok(dto);
     }
 
@@ -58,7 +59,7 @@ public class ValidationRequestController {
      */
     @PostMapping("/{id}/approve")
     public ResponseEntity<ValidationResponseDto> approveValidationRequest(@PathVariable Long id) {
-        ResidenceDetailsDto dto = residenceDetailsService.approveValidationRequest(id);
+        ResidenceDetailsDto dto = adminService.approveValidationRequest(id);
         return ResponseEntity.ok(dto.getValidation());
     }
 
@@ -73,7 +74,7 @@ public class ValidationRequestController {
     public ResponseEntity<ValidationResponseDto> rejectValidationRequest(
             @PathVariable Long id,
             @RequestBody @Valid ValidationActionDto request) {
-        ResidenceDetailsDto dto = residenceDetailsService.rejectValidationRequest(id, request.getComment());
+        ResidenceDetailsDto dto = adminService.rejectValidationRequest(id, request.getComment());
         return ResponseEntity.ok(dto.getValidation());
     }
 }
