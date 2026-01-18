@@ -1,4 +1,4 @@
-package org.itmo.isLab1.utils.crypto;
+package org.itmo.isLab1.common.utils.crypto;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;

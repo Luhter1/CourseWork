@@ -6,13 +6,13 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+
+import org.itmo.isLab1.common.utils.datetime.ZonedDateTimeDeserializer;
+import org.itmo.isLab1.common.utils.datetime.ZonedDateTimeSerializer;
 import org.openapitools.jackson.nullable.JsonNullableModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-
-import org.itmo.isLab1.utils.datetime.ZonedDateTimeDeserializer;
-import org.itmo.isLab1.utils.datetime.ZonedDateTimeSerializer;
 
 import java.time.format.DateTimeFormatter;
 

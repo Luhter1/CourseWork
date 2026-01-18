@@ -1,4 +1,4 @@
-package org.itmo.isLab1.utils.datetime;
+package org.itmo.isLab1.common.utils.datetime;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

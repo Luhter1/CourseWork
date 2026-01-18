@@ -12,8 +12,8 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 import org.itmo.isLab1.common.entity.BaseEntity;
+import org.itmo.isLab1.common.utils.datetime.ZonedDateTimeConverter;
 import org.itmo.isLab1.residences.entity.ResidenceDetails;
-import org.itmo.isLab1.utils.datetime.ZonedDateTimeConverter;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;

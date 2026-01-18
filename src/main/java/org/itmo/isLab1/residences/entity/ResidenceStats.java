@@ -5,7 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.itmo.isLab1.common.entity.BaseEntity;
-import org.itmo.isLab1.utils.datetime.ZonedDateTimeConverter;
+import org.itmo.isLab1.common.utils.datetime.ZonedDateTimeConverter;
 
 import java.time.ZonedDateTime;
 

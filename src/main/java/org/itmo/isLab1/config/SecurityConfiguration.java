@@ -18,7 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.itmo.isLab1.auth.JwtAuthenticationFilter;
-import org.itmo.isLab1.utils.crypto.Sha512PasswordEncoder;
+import org.itmo.isLab1.common.utils.crypto.Sha512PasswordEncoder;
 import org.itmo.isLab1.users.UserService;
 
 import java.util.List;

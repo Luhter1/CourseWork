@@ -1,4 +1,4 @@
-package org.itmo.isLab1.utils.datetime;
+package org.itmo.isLab1.common.utils.datetime;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;

@@ -15,7 +15,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.itmo.isLab1.common.entity.BaseEntity;
-import org.itmo.isLab1.utils.datetime.ZonedDateTimeConverter;
+import org.itmo.isLab1.common.utils.datetime.ZonedDateTimeConverter;
 
 @Data
 @Entity
