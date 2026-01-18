@@ -91,6 +91,8 @@ public class SecurityConfiguration {
 
                 request.requestMatchers("/api/admin/validation-requests/**").hasRole("SUPERADMIN");
 
+                request.requestMatchers("/api/experts**").hasRole("RESIDENCE_ADMIN");
+
                 request.requestMatchers("/api/notifications/**").authenticated();
 
                 // Всё остальное - deny
